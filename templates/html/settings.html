@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Settings</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/settings.css') }}">
+</head>
+<body>
+    <h2>⚙️ Restaurant Settings</h2>
+    <form id="settingsForm" method="POST" action="/settings" enctype="multipart/form-data">
+        <label>Restaurant Name:</label>
+        <input type="text" name="restaurant_name" value="{{ settings.restaurant_name }}" required>
+
+        <label>Contact Number:</label>
+        <input type="text" name="contact_number" value="{{ settings.contact_number }}" required>
+
+        <label>
+            <input type="checkbox" name="vat_enabled" {% if settings.vat_enabled %}checked{% endif %}>
+            Enable VAT
+        </label>
+
+        <label>Logo Path (upload new):</label>
+        <input type="file" name="logo_file">
+
+        <label>VAT (%):</label>
+        <input type="number" name="vat" min="0" max="100" step="0.01" placeholder="VAT %" value="{{ settings.vat }}">
+
+        <label>CGST (%):</label>
+        <input type="number" name="cgst" min="0" max="100" step="0.01" placeholder="CGST %" value="{{ settings.cgst }}">
+
+        <label>SGST (%):</label>
+        <input type="number" name="sgst" min="0" max="100" step="0.01" placeholder="SGST %" value="{{ settings.sgst }}">
+
+        <label>Total Tables:</label>
+        <input type="number" name="total_tables" value="{{ settings.total_tables }}" min="1">
+
+        <button type="submit" id="saveButton">💾 Save Settings</button>
+    </form>
+
+    <form id="licenseForm" method="POST" action="/renew-license">
+        <label>Renew License Key:</label>
+        <input type="text" name="license_key" required>
+        <button type="submit" id="renewButton" style="background-color: orange;">🔑 Renew License</button>
+    </form>
+
+    <div id="statusMessage" class="message"></div>
+
+    <script src="{{ url_for('static', filename='js/settings.js') }}"></script>
+</body>
+</html>

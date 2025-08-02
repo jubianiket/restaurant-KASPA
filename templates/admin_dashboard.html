@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard - Restaurant</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f9f9f9; }
+        h1 { color: #333; }
+        .card { background: white; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .label { font-weight: bold; color: #555; }
+    </style>
+</head>
+<body>
+    <h1>🍽️ Admin Dashboard</h1>
+
+    <div class="card">
+        <p class="label">Date:</p>
+        <p id="date">Loading...</p>
+
+        <p class="label">Total Sales:</p>
+        <p id="sales">Loading...</p>
+
+        <p class="label">Orders Today:</p>
+        <p id="orders">Loading...</p>
+
+        <p class="label">License Expiry:</p>
+        <p id="expiry">Loading...</p>
+    </div>
+
+    <script>
+        fetch("/api/dashboard-summary")
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("date").textContent = data.date;
+                document.getElementById("sales").textContent = `₹${data.total_sales}`;
+                document.getElementById("orders").textContent = data.orders_today;
+                document.getElementById("expiry").textContent = data.license_expiry;
+            })
+            .catch(err => {
+                console.error("Failed to fetch dashboard data:", err);
+                document.body.innerHTML += "<p style='color:red;'>Failed to load dashboard summary.</p>";
+            });
+    </script>
+</body>
+</html>

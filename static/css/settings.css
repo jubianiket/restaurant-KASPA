@@ -1,0 +1,31 @@
+/*
+  --- Unified Color Scheme Reference ---
+  Main background: #f4f7f6
+  Main text: #333
+  Headings: #2c3e50
+  Primary button: #4CAF50 (hover: #388e3c)
+  Danger button: #dc3545 (hover: #c82333)
+  Table header: #f0f0f0
+  Modal border: #4CAF50
+*/
+ body { font-family: Arial, sans-serif; background-color: #f4f7f6; color: #333; padding: 20px; }
+ h2 { color: #2c3e50; }
+        form { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        input[type="text"], input[type="number"], input[type="file"] {
+            width: 100%; padding: 8px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px;
+        }
+
+        input[name="gst"], input[name="cgst"], input[name="sgst"] {
+            max-width: 120px;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        label[for="gst"], label[for="cgst"], label[for="sgst"] {
+            display: inline-block;
+            margin-top: 10px;
+        }
+        label { font-weight: bold; }
+ button { padding: 10px 20px; margin-top: 15px; background-color: #4CAF50; color: white; border: 1px solid #4CAF50; border-radius: 4px; cursor: pointer; transition: background-color 0.2s, border-color 0.2s; }
+ button:hover { background-color: #388e3c; border-color: #388e3c; }
+        .message { margin: 10px 0; color: green; }

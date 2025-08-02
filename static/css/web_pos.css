@@ -1,0 +1,154 @@
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f7f7f7;
+}
+
+.sidebar {
+    width: 220px;
+    background-color: #4A6E8A;
+    color: white;
+    height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+    position: fixed;
+    left: 0;
+    top: 0;
+    transition: width 0.3s;
+    overflow-x: hidden;
+    z-index: 10;
+}
+
+.sidebar.collapsed {
+    width: 56px;
+}
+
+.sidebar #sidebarToggle {
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    color: white;
+    cursor: pointer;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.sidebar h2 {
+    font-size: 20px;
+    margin: 10px 0;
+    transition: opacity 0.3s;
+}
+
+.sidebar.collapsed h2 {
+    opacity: 0;
+    height: 0;
+    overflow: hidden;
+}
+
+.sidebar button,
+.sidebar a.logout-link {
+    display: flex;
+    align-items: center;
+    background-color: #FF8C42;
+    border: none;
+    color: white;
+    padding: 10px;
+    margin: 8px 0;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.2s;
+    width: 100%;
+}
+
+.sidebar button:hover,
+.sidebar a.logout-link:hover {
+    background-color: #FF6B35;
+}
+
+.sidebar .icon {
+    width: 1.5em;
+    text-align: center;
+    margin-right: 8px;
+}
+
+.sidebar .sidebar-label {
+    display: inline-block;
+    transition: opacity 0.3s ease;
+}
+
+.sidebar.collapsed .sidebar-label {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+}
+
+.main {
+    margin-left: 220px;
+    padding: 20px;
+    transition: margin-left 0.3s;
+}
+
+.main.sidebar-collapsed {
+    margin-left: 56px;
+}
+
+.header {
+    background-color: #D4F0F0;
+    color: #2C3E50;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.card {
+    background-color: white;
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+#contentFrame {
+    width: 100%;
+    height: 575px;
+    border: none;
+    margin-top: 10px;
+}
+
+@media (max-width: 700px) {
+    .sidebar {
+        width: 56px;
+    }
+    .main {
+        margin-left: 56px;
+    }
+}
+/* Hide clock and summary when collapsed */
+.sidebar.collapsed #clock,
+.sidebar.collapsed #salesSummary {
+    display: none;
+}
+
+/* Minimal button look in collapsed mode */
+.sidebar.collapsed button,
+.sidebar.collapsed a.logout-link {
+    background-color: transparent !important;
+    justify-content: center;
+    padding: 10px 0;
+}
+
+.sidebar.collapsed .icon {
+    margin-right: 0;
+}
+
+.sidebar.collapsed button:hover,
+.sidebar.collapsed a.logout-link:hover {
+    background-color: transparent !important;
+}
+
+/* Optional: remove spacing/margin to compress button stack */
+.sidebar.collapsed button,
+.sidebar.collapsed a.logout-link {
+    margin: 6px 0;
+}

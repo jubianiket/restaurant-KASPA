@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Menu Management</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/menu.css') }}">
+  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+  <div class="pos-container">
+        <header class="pos-header">
+            <h1>Take Order</h1>
+
+  <div class="form-group">
+    <input type="text" id="name" placeholder="Name">
+    <input type="number" id="rate" placeholder="Rate">
+    <input type="text" id="category" placeholder="Category">
+    <input type="text" id="portion" placeholder="Portion">
+    <div class="action-buttons"> <button onclick="addItem()">➕ Add</button>
+                <button onclick="updateItem()">📝 Update</button>
+                <button onclick="deleteItem()">❌ Delete</button>
+            </div>
+  </div>
+
+   <div class="bulk-upload-controls">
+            <label><b>📁 Bulk Upload (Excel .xlsx)</b></label>
+            <input type="file" id="excelFile" accept=".xlsx">
+            <button onclick="uploadExcel()">⬆️ Upload Excel</button>
+        </div>
+
+  <table id="menuTable">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Rate</th>
+        <th>Category</th>
+        <th>Portion</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script src="{{ url_for('static', filename='js/menu.js') }}"></script>
+</body>
+</html>
