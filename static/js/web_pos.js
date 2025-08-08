@@ -30,10 +30,12 @@ function toggleTheme() {
     document.body.classList.toggle("dark-mode");
 }
 
-// Sidebar collapse/expand functionality
+// Sidebar elements
 const sidebar = document.getElementById("sidebar");
 const main = document.getElementById("mainContent");
 const toggleBtn = document.getElementById("sidebarToggle");
+const mobileToggleBtn = document.getElementById("mobileSidebarToggle");
+const sidebarBackdrop = document.getElementById("sidebarBackdrop");
 
 function setSidebarCollapsed(collapsed) {
     if (collapsed) {
@@ -47,28 +49,72 @@ function setSidebarCollapsed(collapsed) {
     }
 }
 
+function isMobilePortrait() {
+    return window.matchMedia("(orientation: portrait), (max-aspect-ratio: 9/16)").matches;
+}
+
+function openMobileSidebar() {
+    sidebar.classList.add("open");
+    sidebarBackdrop.classList.add("visible");
+    document.body.style.overflow = "hidden";
+}
+
+function closeMobileSidebar() {
+    sidebar.classList.remove("open");
+    sidebarBackdrop.classList.remove("visible");
+    document.body.style.overflow = "";
+}
+
+// Desktop sidebar collapse toggle
 toggleBtn.addEventListener("click", () => {
+    if (isMobilePortrait()) {
+        // In mobile, use off-canvas open instead of collapse mode
+        openMobileSidebar();
+        return;
+    }
     const collapsed = sidebar.classList.contains("collapsed");
     setSidebarCollapsed(!collapsed);
 });
 
-function shouldAutoCollapse() {
-    return window.matchMedia("(max-width: 700px), (max-aspect-ratio: 9/16)").matches;
-}
-
-// Apply saved sidebar state on load
-window.addEventListener("DOMContentLoaded", () => {
-    const stored = localStorage.getItem("sidebarCollapsed");
-    if (stored === null) {
-        setSidebarCollapsed(shouldAutoCollapse());
+// Mobile hamburger toggle
+mobileToggleBtn.addEventListener("click", () => {
+    if (sidebar.classList.contains("open")) {
+        closeMobileSidebar();
     } else {
-        setSidebarCollapsed(stored === "1");
+        openMobileSidebar();
     }
 });
 
+// Tap backdrop to close
+sidebarBackdrop.addEventListener("click", () => closeMobileSidebar());
+
+// Apply saved sidebar state on load (desktop only)
+window.addEventListener("DOMContentLoaded", () => {
+    const stored = localStorage.getItem("sidebarCollapsed");
+    if (!isMobilePortrait()) {
+        if (stored === null) {
+            setSidebarCollapsed(false);
+        } else {
+            setSidebarCollapsed(stored === "1");
+        }
+    } else {
+        // Ensure closed by default on mobile
+        closeMobileSidebar();
+    }
+});
+
+// On resize, switch behavior appropriately
 window.addEventListener("resize", () => {
-    if (localStorage.getItem("sidebarCollapsed") === null) {
-        setSidebarCollapsed(shouldAutoCollapse());
+    if (isMobilePortrait()) {
+        closeMobileSidebar();
+        // Remove desktop collapsed markers to avoid weird state when switching back
+        sidebar.classList.remove("collapsed");
+        main.classList.remove("sidebar-collapsed");
+    } else {
+        sidebarBackdrop.classList.remove("visible");
+        sidebar.classList.remove("open");
+        const stored = localStorage.getItem("sidebarCollapsed");
+        setSidebarCollapsed(stored === "1");
     }
 });
 

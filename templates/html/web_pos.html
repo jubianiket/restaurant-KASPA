@@ -26,6 +26,7 @@
 
     <div class="main" id="mainContent">
         <div class="header">
+            <button id="mobileSidebarToggle" class="mobile-toggle" aria-label="Open menu">☰</button>
             <h1>🍽️ Welcome to <span id="welcomeRestaurant">Restaurant</span></h1>
         </div>
 
@@ -33,6 +34,8 @@
             <iframe id="contentFrame" src=""></iframe>
         </div>
     </div>
+
+    <div id="sidebarBackdrop" class="sidebar-backdrop"></div>
 
     <script src="{{ url_for('static', filename='js/web_pos.js') }}"></script>
 </body>

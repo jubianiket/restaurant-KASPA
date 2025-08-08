@@ -99,6 +99,16 @@ body {
     color: #2C3E50;
     padding: 10px;
     border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.header .mobile-toggle {
+    display: none;
+    background: transparent;
+    border: none;
+    font-size: 1.4rem;
+    cursor: pointer;
 }
 
 .card {
@@ -125,23 +135,33 @@ body {
     }
 }
 @media (orientation: portrait), (max-aspect-ratio: 9/16) {
+    /* Off-canvas mobile sidebar */
+    .header .mobile-toggle { display: inline-block; }
     .sidebar {
-        width: 56px;
+        transform: translateX(-100%);
+        width: 260px;
+        max-width: 80vw;
+        height: 100dvh;
+        padding-top: 16px;
+        transition: transform 0.3s ease-out;
     }
-    .main {
-        margin-left: 56px;
-        padding: 12px;
+    .sidebar.open { transform: translateX(0); }
+    .main { margin-left: 0; padding: 12px; }
+    .sidebar-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.4);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease-in-out;
     }
-    .header h1 {
-        font-size: 1.1rem;
+    .sidebar-backdrop.visible {
+        opacity: 1;
+        pointer-events: auto;
     }
-    .card {
-        padding: 12px;
-        margin-top: 12px;
-    }
-    #contentFrame {
-        height: calc(100dvh - 160px);
-    }
+    .header h1 { font-size: 1.1rem; }
+    .card { padding: 12px; margin-top: 12px; }
+    #contentFrame { height: calc(100dvh - 160px); }
 }
 /* Hide clock and summary when collapsed */
 .sidebar.collapsed #clock,
