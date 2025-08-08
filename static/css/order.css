@@ -673,7 +673,28 @@
         body.is-mobile #orderTable tbody { max-height: 300px; }
         body.is-mobile .action-buttons button { padding: 12px 16px; font-size: 1rem; }
 
+/* Hide mobile-only UI by default */
+.mobile-cart-bar, .mobile-fab, .mobile-sheet-backdrop, .mobile-cart-sheet { display: none; }
+
 /* Mobile Android POS UI: bottom bar, FAB, bottom sheet */
+body.is-mobile .mobile-cart-bar { display: flex; }
+body.is-mobile .mobile-fab { display: inline-flex; align-items: center; justify-content: center; }
+body.is-mobile .mobile-sheet-backdrop { display: block; }
+body.is-mobile .mobile-cart-sheet { display: block; }
+
+/* Avoid overlap: add padding-bottom to main content when mobile bottom bar is visible */
+body.is-mobile .pos-container { padding-bottom: 72px; }
+
+/* Drag interaction helpers for mobile sheet */
+body.is-mobile .mobile-cart-sheet.dragging { transition: none; }
+body.is-mobile .mobile-cart-sheet .sheet-header { position: relative; }
+body.is-mobile .mobile-cart-sheet .sheet-header::before {
+    content: "";
+    position: absolute; top: 6px; left: 50%; transform: translateX(-50%);
+    width: 36px; height: 4px; border-radius: 2px; background: #ccc;
+}
+
+/* Mobile Android POS UI: bottom bar styling */
 body.is-mobile .mobile-cart-bar {
     position: fixed;
     left: 0; right: 0; bottom: 0;
@@ -691,6 +712,7 @@ body.is-mobile .mobile-cart-bar .actions button {
     padding: 8px 14px; font-weight: 700; cursor: pointer;
 }
 
+/* FAB styling */
 body.is-mobile .mobile-fab {
     position: fixed; right: 16px; bottom: 70px;
     width: 56px; height: 56px; border-radius: 28px;
@@ -699,6 +721,7 @@ body.is-mobile .mobile-fab {
     z-index: 60;
 }
 
+/* Backdrop visibility + transitions */
 body.is-mobile .mobile-sheet-backdrop {
     position: fixed; inset: 0; background: rgba(0,0,0,0.35);
     opacity: 0; pointer-events: none; transition: opacity .2s ease;
@@ -706,6 +729,7 @@ body.is-mobile .mobile-sheet-backdrop {
 }
 body.is-mobile .mobile-sheet-backdrop.visible { opacity: 1; pointer-events: auto; }
 
+/* Bottom sheet styling */
 body.is-mobile .mobile-cart-sheet {
     position: fixed; left: 0; right: 0; bottom: 0;
     transform: translateY(100%);
@@ -727,15 +751,3 @@ body.is-mobile .mobile-cart-sheet .sheet-footer .totals { font-weight: 600; }
 body.is-mobile .mobile-cart-sheet .sheet-footer .grand { font-size: 1.1rem; margin-top: 6px; }
 body.is-mobile .mobile-cart-sheet .sheet-footer .buttons { display:flex; gap:10px; margin-top: 10px; }
 body.is-mobile .mobile-cart-sheet .sheet-footer .buttons button { flex:1; background:#4CAF50; color:#fff; padding: 10px 14px; border:none; border-radius: 6px; font-weight:700; }
-
-/* Avoid overlap: add padding-bottom to main content when mobile bottom bar is visible */
-body.is-mobile .pos-container { padding-bottom: 72px; }
-
-/* Drag interaction helpers for mobile sheet */
-body.is-mobile .mobile-cart-sheet.dragging { transition: none; }
-body.is-mobile .mobile-cart-sheet .sheet-header { position: relative; }
-body.is-mobile .mobile-cart-sheet .sheet-header::before {
-    content: "";
-    position: absolute; top: 6px; left: 50%; transform: translateX(-50%);
-    width: 36px; height: 4px; border-radius: 2px; background: #ccc;
-}
