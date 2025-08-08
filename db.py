@@ -23,10 +23,11 @@ def append_items_to_order(order_id, items):
 from supabase import create_client, Client
 import bcrypt
 import datetime # Import datetime here, it was missing earlier for datetime.datetime.now()
+import os
 
-# Replace with your Supabase credentials
-SUPABASE_URL = "https://iwfunipsnoqfasntaofl.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml3ZnVuaXBzbm9xZmFzbnRhb2ZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA2NzU1MjQsImV4cCI6MjA2NjI1MTUyNH0.E2YU0wDS16TUsIbX8qIM3Xo6XZF3Z_GuWFUmjWw7Z7A"
+# Replace with your Supabase credentials (env vars preferred for deployment)
+SUPABASE_URL = os.getenv("SUPABASE_URL", "https://iwfunipsnoqfasntaofl.supabase.co")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml3ZnVuaXBzbm9xZmFzbnRhb2ZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA2NzU1MjQsImV4cCI6MjA2NjI1MTUyNH0.E2YU0wDS16TUsIbX8qIM3Xo6XZF3Z_GuWFUmjWw7Z7A")
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
@@ -57,8 +58,8 @@ def update_password(username, new_password):
     if not user.data:
         return False
     hashed_pw = hash_password(new_password)
-    result = supabase.table("users").update({"password_hash": hashed_pw}).eq("username", username).execute()
-    return result.status_code == 204
+    result = supabase.table("users").update({"password": hashed_pw}).eq("username", username).execute()
+    return getattr(result, "status_code", 200) in (200, 204)
 
 
 def get_all_users():
@@ -183,20 +184,30 @@ def delete_inventory_item(name):
     return supabase.table("inventory").delete().eq("name", name).execute()
 
 # ---------- Dashboard Summary ----------
-import sqlite3
-# from datetime import datetime # Already imported at the top
-from utils import resource_path
-
-DB_FILE = resource_path("restaurant.db")
 
 def get_today_summary():
-    today = datetime.datetime.now().strftime("%d-%m-%Y")  # Corrected to datetime.datetime
-    conn = sqlite3.connect(DB_FILE)
-    cur = conn.cursor()
-    cur.execute("SELECT COUNT(*), SUM(total) FROM orders WHERE date LIKE ?", (f"{today}%",))
-    count, total = cur.fetchone()
-    conn.close()
+    """
+    Compute today's order count and total sales from Supabase 'orders' table.
+    Relies on the 'date' column being stored as a string in '%Y-%m-%d %H:%M:%S' format
+    as inserted by save_order.
+    """
+    today_str = datetime.datetime.now().strftime("%Y-%m-%d")
+    from_dt = f"{today_str} 00:00:00"
+    to_dt = f"{today_str} 23:59:59"
+
+    result = supabase.table("orders").select("total").gte("date", from_dt).lte("date", to_dt).execute()
+    rows = result.data or []
+
+    def to_number(value):
+        try:
+            return float(value)
+        except Exception:
+            return 0.0
+
+    orders_today = len(rows)
+    total_sales = sum(to_number(row.get("total")) for row in rows)
+
     return {
-        "orders_today": count or 0,
-        "total_sales": round(total or 0, 2)
+        "orders_today": orders_today,
+        "total_sales": round(total_sales or 0, 2)
     }

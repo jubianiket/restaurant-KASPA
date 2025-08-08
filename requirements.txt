@@ -1,0 +1,6 @@
+flask
+flask-cors
+gunicorn
+supabase==2.7.4
+bcrypt
+cryptography
