@@ -142,9 +142,17 @@ body.is-mobile .sidebar {
     max-width: 80vw;
     height: 100dvh;
     padding-top: 16px;
-    transition: transform 0.3s ease-out;
+    transition: transform 0.3s ease-out, opacity 0.2s ease-in-out;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
 }
-body.is-mobile .sidebar.open { transform: translateX(0); }
+body.is-mobile .sidebar.open {
+    transform: translateX(0);
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
 body.is-mobile .main { margin-left: 0; padding: 12px; }
 body.is-mobile .sidebar-backdrop {
     position: fixed;
