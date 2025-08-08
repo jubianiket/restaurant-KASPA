@@ -622,6 +622,7 @@ function createTableButtons() {
             }
             selectTable(selectedTable);
         })
+        .then(() => { try { applyMobileOptimizations(); } catch(e){} })
         .catch(err => console.error('Error fetching table settings:', err));
 }
 
@@ -814,3 +815,15 @@ window.addEventListener('DOMContentLoaded', bindMobileControls);
     window.addEventListener('mousemove', onTouchMove);
     window.addEventListener('mouseup', onTouchEnd);
 })();
+
+// Mobile optimizations: compact table labels and category/menu layout
+function applyMobileOptimizations() {
+    const isMobile = document.body.classList.contains('is-mobile');
+    // Shorten table button labels
+    if (isMobile) {
+        document.querySelectorAll('.table-btn').forEach(btn => {
+            const num = btn.dataset.tableNum || btn.textContent.replace(/\D/g, '');
+            btn.textContent = `T${num}`;
+        });
+    }
+}

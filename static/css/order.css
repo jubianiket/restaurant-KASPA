@@ -751,3 +751,23 @@ body.is-mobile .mobile-cart-sheet .sheet-footer .totals { font-weight: 600; }
 body.is-mobile .mobile-cart-sheet .sheet-footer .grand { font-size: 1.1rem; margin-top: 6px; }
 body.is-mobile .mobile-cart-sheet .sheet-footer .buttons { display:flex; gap:10px; margin-top: 10px; }
 body.is-mobile .mobile-cart-sheet .sheet-footer .buttons button { flex:1; background:#4CAF50; color:#fff; padding: 10px 14px; border:none; border-radius: 6px; font-weight:700; }
+
+/* Simplify mobile layout for 9:16 */
+body.is-mobile .right-panel { display: none; }
+body.is-mobile .left-panel {
+    position: sticky; top: 0; z-index: 5;
+    background: #ffffff; padding: 8px 8px 6px 8px; border-bottom: 1px solid var(--border-color);
+}
+body.is-mobile .left-panel .panel-title { display: none; }
+body.is-mobile .tables-grid {
+    display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 8px;
+    padding: 0 4px; max-height: none;
+}
+body.is-mobile .table-btn {
+    padding: 10px 12px; font-size: 0.9em; white-space: nowrap; min-width: auto;
+}
+body.is-mobile .middle-panel { padding: 10px; }
+body.is-mobile .middle-panel .panel-title { display: none; }
+body.is-mobile .category-btns { overflow-x: auto; -webkit-overflow-scrolling: touch; flex-wrap: nowrap; gap: 10px; }
+body.is-mobile .search-box { margin: 8px 0; }
+body.is-mobile .item-grid { gap: 12px; padding: 0 35px; min-height: 140px; max-height: 55vh; }
