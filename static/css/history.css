@@ -321,3 +321,10 @@ table#ordersTable td:nth-child(10) { width: 100px; } /* Action Button */
     table#ordersTable th, table#ordersTable td { padding: 10px 12px; font-size: 14px; }
     .table-scroll { max-height: 60vh; }
 }
+
+/* JS-scoped mobile layout */
+body.is-mobile .pos-container { width: 100%; margin: 10px 0; }
+body.is-mobile .controls { flex-wrap: wrap; }
+body.is-mobile table#ordersTable th,
+body.is-mobile table#ordersTable td { padding: 10px 12px; font-size: 14px; }
+body.is-mobile .table-scroll { max-height: calc(var(--vh, 100vh) - 260px); }

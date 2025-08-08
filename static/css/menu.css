@@ -339,3 +339,15 @@ button:focus {
         -webkit-overflow-scrolling: touch;
     }
 }
+
+/* JS-scoped mobile layout */
+body.is-mobile .input-controls,
+body.is-mobile .bulk-upload-controls {
+    flex-direction: column;
+    align-items: stretch;
+}
+body.is-mobile #menuTable {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}

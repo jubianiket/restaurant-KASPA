@@ -638,47 +638,37 @@
             }
         }
 
-        @media (orientation: portrait), (max-aspect-ratio: 9/16) {
-            body {
-                overflow: auto;
-                padding: 8px;
-            }
-            .pos-container {
-                grid-template-columns: 1fr;
-                grid-template-rows: auto auto 1fr auto;
-                height: auto;
-                min-height: 100dvh;
-                width: 100%;
-                max-width: none;
-            }
-            .pos-header {
-                font-size: 1rem;
-                flex-direction: column;
-                gap: 8px;
-                padding: 10px;
-            }
-            .left-panel, .middle-panel, .right-panel {
-                grid-column: 1;
-                border-left: none;
-                border-right: none;
-                border-bottom: 1px solid var(--border-color);
-                padding: 12px;
-            }
-            .tables-grid {
-                grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
-                max-height: 220px;
-            }
-            .item-grid {
-                gap: 8px;
-                padding: 0 36px;
-                min-height: 120px;
-                max-height: 280px;
-            }
-            #orderTable tbody {
-                max-height: 300px;
-            }
-            .action-buttons button {
-                padding: 12px 16px;
-                font-size: 1rem;
-            }
+        /* JS-scoped mobile layout (auto-detected) */
+        body.is-mobile .pos-container {
+            grid-template-columns: 1fr;
+            grid-template-rows: auto auto 1fr auto;
+            height: auto;
+            min-height: calc(var(--vh, 100vh) - 20px);
+            width: 100%;
+            max-width: none;
         }
+        body.is-mobile .pos-header {
+            font-size: 1rem;
+            flex-direction: column;
+            gap: 8px;
+            padding: 10px;
+        }
+        body.is-mobile .left-panel, body.is-mobile .middle-panel, body.is-mobile .right-panel {
+            grid-column: 1;
+            border-left: none;
+            border-right: none;
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px;
+        }
+        body.is-mobile .tables-grid {
+            grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+            max-height: 220px;
+        }
+        body.is-mobile .item-grid {
+            gap: 8px;
+            padding: 0 36px;
+            min-height: 120px;
+            max-height: 280px;
+        }
+        body.is-mobile #orderTable tbody { max-height: 300px; }
+        body.is-mobile .action-buttons button { padding: 12px 16px; font-size: 1rem; }

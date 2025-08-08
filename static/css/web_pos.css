@@ -134,35 +134,34 @@ body {
         margin-left: 56px;
     }
 }
-@media (orientation: portrait), (max-aspect-ratio: 9/16) {
-    /* Off-canvas mobile sidebar */
-    .header .mobile-toggle { display: inline-block; }
-    .sidebar {
-        transform: translateX(-100%);
-        width: 260px;
-        max-width: 80vw;
-        height: 100dvh;
-        padding-top: 16px;
-        transition: transform 0.3s ease-out;
-    }
-    .sidebar.open { transform: translateX(0); }
-    .main { margin-left: 0; padding: 12px; }
-    .sidebar-backdrop {
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,0.4);
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.2s ease-in-out;
-    }
-    .sidebar-backdrop.visible {
-        opacity: 1;
-        pointer-events: auto;
-    }
-    .header h1 { font-size: 1.1rem; }
-    .card { padding: 12px; margin-top: 12px; }
-    #contentFrame { height: calc(100dvh - 160px); }
+/* Mobile/off-canvas driven by JS detection */
+body.is-mobile .header .mobile-toggle { display: inline-block; }
+body.is-mobile .sidebar {
+    transform: translateX(-100%);
+    width: 260px;
+    max-width: 80vw;
+    height: 100dvh;
+    padding-top: 16px;
+    transition: transform 0.3s ease-out;
 }
+body.is-mobile .sidebar.open { transform: translateX(0); }
+body.is-mobile .main { margin-left: 0; padding: 12px; }
+body.is-mobile .sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease-in-out;
+}
+body.is-mobile .sidebar-backdrop.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+body.is-mobile .header h1 { font-size: 1.1rem; }
+body.is-mobile .card { padding: 12px; margin-top: 12px; }
+body.is-mobile #contentFrame { height: calc(100dvh - var(--header-h, 120px) - 40px); }
+
 /* Hide clock and summary when collapsed */
 .sidebar.collapsed #clock,
 .sidebar.collapsed #salesSummary {
