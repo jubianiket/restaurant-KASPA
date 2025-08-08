@@ -20,7 +20,8 @@ default_settings = {
     "total_tables": 12,
     "vat": 0.0,
     "cgst": 0.0,
-    "sgst": 0.0
+    "sgst": 0.0,
+    "secret_key": "your-secret-key" # Added for Flask secret key fallback
 }
 
 def load_settings():
@@ -44,7 +45,8 @@ from db import complete_order_for_table
 from license import get_license_expiry_date
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
-app.secret_key = "your-secret-key"
+secret_key = os.getenv("SECRET_KEY") or load_settings().get("secret_key") or "change-me"
+app.secret_key = secret_key
 CORS(app)
 
 # -------------- Auth Decorator ----------------

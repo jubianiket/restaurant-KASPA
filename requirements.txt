@@ -1,6 +1,11 @@
 Flask
+
 flask-cors
-supabase
-cryptography
-bcrypt
+
 gunicorn
+
+supabase==2.7.4
+
+bcrypt
+
+cryptography
