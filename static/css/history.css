@@ -313,3 +313,11 @@ table#ordersTable td:nth-child(10) { width: 100px; } /* Action Button */
 .pending {
     background-color: #fff0e6;
 }
+
+@media (orientation: portrait), (max-aspect-ratio: 9/16), (max-width: 480px) {
+    body { padding: 10px; height: auto; min-height: 100dvh; overflow: auto; }
+    .pos-container { width: 100%; margin: 10px 0; }
+    .controls { flex-wrap: wrap; }
+    table#ordersTable th, table#ordersTable td { padding: 10px 12px; font-size: 14px; }
+    .table-scroll { max-height: 60vh; }
+}
