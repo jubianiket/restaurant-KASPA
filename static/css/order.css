@@ -730,3 +730,12 @@ body.is-mobile .mobile-cart-sheet .sheet-footer .buttons button { flex:1; backgr
 
 /* Avoid overlap: add padding-bottom to main content when mobile bottom bar is visible */
 body.is-mobile .pos-container { padding-bottom: 72px; }
+
+/* Drag interaction helpers for mobile sheet */
+body.is-mobile .mobile-cart-sheet.dragging { transition: none; }
+body.is-mobile .mobile-cart-sheet .sheet-header { position: relative; }
+body.is-mobile .mobile-cart-sheet .sheet-header::before {
+    content: "";
+    position: absolute; top: 6px; left: 50%; transform: translateX(-50%);
+    width: 36px; height: 4px; border-radius: 2px; background: #ccc;
+}

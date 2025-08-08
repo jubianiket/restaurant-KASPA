@@ -757,3 +757,60 @@ function bindMobileControls() {
 
 // Attach on load
 window.addEventListener('DOMContentLoaded', bindMobileControls);
+
+// --- Mobile bottom sheet drag gestures ---
+(function initMobileSheetDrag(){
+    if (!mobileCartSheet || !mobileCartBackdrop) return;
+    let startY = 0; let currentY = 0; let isDragging = false; let sheetHeight = 0;
+
+    function onTouchStart(e){
+        if (!isMobileUI()) return;
+        const touch = e.touches ? e.touches[0] : e;
+        startY = touch.clientY; currentY = startY; isDragging = true;
+        sheetHeight = mobileCartSheet.getBoundingClientRect().height;
+        mobileCartSheet.classList.add('dragging');
+        // If closed, allow partial pull-up gesture only from near the bottom
+        if (!mobileCartSheet.classList.contains('open')) {
+            // Allow drag if user starts near bottom of viewport
+            if (startY < window.innerHeight - 120) { isDragging = false; mobileCartSheet.classList.remove('dragging'); }
+        }
+        e.preventDefault();
+    }
+    function onTouchMove(e){
+        if (!isDragging) return;
+        const touch = e.touches ? e.touches[0] : e;
+        currentY = touch.clientY;
+        const delta = Math.max(0, currentY - startY);
+        // Translate sheet down when dragging down; clamp within its height
+        const translate = Math.min(sheetHeight, delta);
+        mobileCartSheet.style.transform = `translateY(${translate}px)`;
+        // Fade backdrop with progress
+        const progress = Math.min(1, translate / sheetHeight);
+        mobileCartBackdrop.style.opacity = String(1 - progress * 0.8);
+        e.preventDefault();
+    }
+    function onTouchEnd(){
+        if (!isDragging) return;
+        isDragging = false;
+        mobileCartSheet.classList.remove('dragging');
+        const delta = Math.max(0, currentY - startY);
+        mobileCartSheet.style.transform = '';
+        mobileCartBackdrop.style.opacity = '';
+        // Threshold: if dragged more than 30% of height, close; otherwise open
+        if (delta > sheetHeight * 0.3) {
+            closeMobileSheet();
+        } else {
+            openMobileSheet();
+        }
+    }
+
+    // Bind to header for drag handle and content for full-area drag
+    const header = mobileCartSheet.querySelector('.sheet-header');
+    const area = header || mobileCartSheet;
+    area.addEventListener('touchstart', onTouchStart, { passive: false });
+    area.addEventListener('touchmove', onTouchMove, { passive: false });
+    area.addEventListener('touchend', onTouchEnd);
+    area.addEventListener('mousedown', onTouchStart);
+    window.addEventListener('mousemove', onTouchMove);
+    window.addEventListener('mouseup', onTouchEnd);
+})();
