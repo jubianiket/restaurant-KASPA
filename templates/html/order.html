@@ -132,6 +132,21 @@
         </div>
     </div>
 
+    <script>
+    (function(){
+        function isMobile(){
+            var w = window.innerWidth, h = window.innerHeight;
+            return w <= 768 || h / Math.max(1, w) >= 16/9;
+        }
+        function apply(){
+            var m = isMobile();
+            document.body.classList.toggle('is-mobile', m);
+            document.documentElement.style.setProperty('--vh', window.innerHeight + 'px');
+        }
+        window.addEventListener('DOMContentLoaded', apply);
+        window.addEventListener('resize', function(){ clearTimeout(window._ordRT); window._ordRT = setTimeout(apply, 100); });
+    })();
+    </script>
     <script src="{{ url_for('static', filename='js/order.js') }}"></script>
 </body>
 </html>
