@@ -294,6 +294,8 @@ function updateTable(items) {
 
     // Update subtotal display
     document.getElementById('subtotalAmount').textContent = subtotal.toFixed(2);
+    // Update mobile UI running totals early
+    updateMobileCartBar(items, subtotal, subtotal);
 
     // Calculate taxes based on settings - allow both taxes to be applied
     let hasAnyTax = false;
@@ -341,6 +343,10 @@ function updateTable(items) {
     }
     
     console.log('💰 Tax calculation:', { subtotal, vatAmount, cgstAmount, sgstAmount, total });
+    
+    // Update mobile UI final totals and render list
+    updateMobileCartBar(items, subtotal, total);
+    renderMobileCartList(items);
     
     document.getElementById('totalAmount').textContent = total.toFixed(2);
 }
@@ -648,3 +654,106 @@ fetch('/api/settings')
         window.restaurantName = (data.data && data.data.restaurant_name) ? data.data.restaurant_name : 'Restaurant Name';
     })
     .catch(() => { window.restaurantName = 'Restaurant Name'; });
+
+// --- Mobile Android POS UI helpers ---
+const mobileCartBar = document.getElementById('mobileCartBar');
+const mobileFab = document.getElementById('mobileFab');
+const mobileCartSheet = document.getElementById('mobileCartSheet');
+const mobileCartBackdrop = document.getElementById('mobileCartBackdrop');
+const mobileCartList = document.getElementById('mobileCartList');
+const mobileSheetClose = document.getElementById('mobileSheetClose');
+const mobileSheetConfirm = document.getElementById('mobileSheetConfirm');
+const mobileViewCartBtn = document.getElementById('mobileViewCartBtn');
+const mobileConfirmBtn = document.getElementById('mobileConfirmBtn');
+
+function isMobileUI() {
+    return document.body.classList && document.body.classList.contains('is-mobile');
+}
+
+function openMobileSheet() {
+    if (!isMobileUI()) return;
+    mobileCartSheet && mobileCartSheet.classList.add('open');
+    mobileCartBackdrop && mobileCartBackdrop.classList.add('visible');
+}
+
+function closeMobileSheet() {
+    mobileCartSheet && mobileCartSheet.classList.remove('open');
+    mobileCartBackdrop && mobileCartBackdrop.classList.remove('visible');
+}
+
+function updateMobileCartBar(items, subtotal, total) {
+    if (!isMobileUI()) return;
+    try {
+        const count = (items || []).reduce((acc, it) => acc + (it.qty || 0), 0);
+        const totalEl = document.getElementById('mobileCartTotal');
+        const countEl = document.getElementById('mobileCartCount');
+        const subEl = document.getElementById('mobileSubtotal');
+        const grandEl = document.getElementById('mobileGrand');
+        if (totalEl) totalEl.textContent = (total || 0).toFixed(2);
+        if (countEl) countEl.textContent = count;
+        if (subEl) subEl.textContent = (subtotal || 0).toFixed(2);
+        if (grandEl) grandEl.textContent = (total || 0).toFixed(2);
+    } catch (e) { /* no-op */ }
+}
+
+function renderMobileCartList(items) {
+    if (!isMobileUI() || !mobileCartList) return;
+    mobileCartList.innerHTML = '';
+    (items || []).forEach((item, idx) => {
+        const row = document.createElement('div');
+        row.className = 'sheet-item';
+        row.innerHTML = `
+            <div class="name">${item.name}</div>
+            <div class="qty-controls">
+                <button data-idx="${idx}" data-act="dec">-</button>
+                <span>${item.qty}</span>
+                <button data-idx="${idx}" data-act="inc">+</button>
+            </div>`;
+        mobileCartList.appendChild(row);
+    });
+    // Delegate click for qty controls
+    mobileCartList.onclick = (e) => {
+        const btn = e.target.closest('button[data-idx]');
+        if (!btn) return;
+        const act = btn.getAttribute('data-act');
+        const idx = parseInt(btn.getAttribute('data-idx'), 10);
+        const currentOrderKey = getCurrentOrderKey();
+        let orderObj = tableOrders[currentOrderKey];
+        if (!orderObj) return;
+        // Work with combined list mapping back into object structure
+        const combined = [...(orderObj.confirmed || []), ...(orderObj.new || [])];
+        const item = combined[idx];
+        if (!item) return;
+        // Modify qty on 'new' list if exists; otherwise on confirmed list (fallback)
+        const newIndex = (orderObj.new || []).findIndex(i => i.name === item.name);
+        if (act === 'inc') {
+            if (newIndex > -1) orderObj.new[newIndex].qty += 1; else combined[idx].qty += 1;
+        } else if (act === 'dec') {
+            if (newIndex > -1) {
+                orderObj.new[newIndex].qty = Math.max(0, orderObj.new[newIndex].qty - 1);
+                if (orderObj.new[newIndex].qty === 0) orderObj.new.splice(newIndex, 1);
+            } else {
+                combined[idx].qty = Math.max(0, combined[idx].qty - 1);
+            }
+        }
+        // Recompute items based on updated object
+        const nextItems = [...(orderObj.confirmed || []), ...(orderObj.new || [])];
+        updateTable(nextItems);
+        saveStateToLocalStorage();
+        openMobileSheet();
+    };
+}
+
+function bindMobileControls() {
+    if (!mobileFab || !mobileCartBar) return;
+    const open = () => openMobileSheet();
+    mobileFab.onclick = open;
+    if (mobileViewCartBtn) mobileViewCartBtn.onclick = open;
+    if (mobileConfirmBtn) mobileConfirmBtn.onclick = () => confirmOrder();
+    if (mobileSheetConfirm) mobileSheetConfirm.onclick = () => confirmOrder();
+    if (mobileSheetClose) mobileSheetClose.onclick = () => closeMobileSheet();
+    if (mobileCartBackdrop) mobileCartBackdrop.onclick = () => closeMobileSheet();
+}
+
+// Attach on load
+window.addEventListener('DOMContentLoaded', bindMobileControls);

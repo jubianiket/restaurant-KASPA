@@ -97,6 +97,41 @@
         </div>
     </div>
 
+    <!-- Mobile-only Android POS UI elements -->
+    <div id="mobileCartBar" class="mobile-cart-bar">
+        <div class="info">
+            <div class="label">Cart</div>
+            <div class="total">₹<span id="mobileCartTotal">0.00</span> • <span id="mobileCartCount">0</span> items</div>
+        </div>
+        <div class="actions">
+            <button id="mobileViewCartBtn" type="button">View</button>
+            <button id="mobileConfirmBtn" type="button">Confirm</button>
+        </div>
+    </div>
+
+    <button id="mobileFab" class="mobile-fab" aria-label="Open cart">🧾</button>
+
+    <div id="mobileCartBackdrop" class="mobile-sheet-backdrop"></div>
+    <div id="mobileCartSheet" class="mobile-cart-sheet">
+        <div class="sheet-header">
+            <span>Order Cart</span>
+            <button id="mobileSheetClose" class="close">✕</button>
+        </div>
+        <div id="mobileCartList" class="sheet-content">
+            <!-- items injected here -->
+        </div>
+        <div class="sheet-footer">
+            <div class="totals">
+                <div>Subtotal: ₹<span id="mobileSubtotal">0.00</span></div>
+                <div class="taxes">Taxes shown as per selection above</div>
+                <div class="grand">Total: ₹<span id="mobileGrand">0.00</span></div>
+            </div>
+            <div class="buttons">
+                <button id="mobileSheetConfirm" type="button">Confirm Order</button>
+            </div>
+        </div>
+    </div>
+
     <script src="{{ url_for('static', filename='js/order.js') }}"></script>
 </body>
 </html>
