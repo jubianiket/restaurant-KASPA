@@ -134,6 +134,7 @@ body {
         margin-left: 56px;
     }
 }
+
 /* Mobile/off-canvas driven by JS detection */
 body.is-mobile .header .mobile-toggle { display: inline-block; }
 body.is-mobile .sidebar {
