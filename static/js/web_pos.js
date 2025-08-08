@@ -52,10 +52,24 @@ toggleBtn.addEventListener("click", () => {
     setSidebarCollapsed(!collapsed);
 });
 
+function shouldAutoCollapse() {
+    return window.matchMedia("(max-width: 700px), (max-aspect-ratio: 9/16)").matches;
+}
+
 // Apply saved sidebar state on load
 window.addEventListener("DOMContentLoaded", () => {
-    const collapsed = localStorage.getItem("sidebarCollapsed") === "1";
-    setSidebarCollapsed(collapsed);
+    const stored = localStorage.getItem("sidebarCollapsed");
+    if (stored === null) {
+        setSidebarCollapsed(shouldAutoCollapse());
+    } else {
+        setSidebarCollapsed(stored === "1");
+    }
+});
+
+window.addEventListener("resize", () => {
+    if (localStorage.getItem("sidebarCollapsed") === null) {
+        setSidebarCollapsed(shouldAutoCollapse());
+    }
 });
 
 // Initial load

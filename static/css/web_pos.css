@@ -124,6 +124,25 @@ body {
         margin-left: 56px;
     }
 }
+@media (orientation: portrait), (max-aspect-ratio: 9/16) {
+    .sidebar {
+        width: 56px;
+    }
+    .main {
+        margin-left: 56px;
+        padding: 12px;
+    }
+    .header h1 {
+        font-size: 1.1rem;
+    }
+    .card {
+        padding: 12px;
+        margin-top: 12px;
+    }
+    #contentFrame {
+        height: calc(100dvh - 160px);
+    }
+}
 /* Hide clock and summary when collapsed */
 .sidebar.collapsed #clock,
 .sidebar.collapsed #salesSummary {

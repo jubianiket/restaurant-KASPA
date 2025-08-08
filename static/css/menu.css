@@ -325,3 +325,17 @@ button:focus {
         justify-content: center;
     }
 }
+
+@media (orientation: portrait), (max-aspect-ratio: 9/16), (max-width: 480px) {
+    body { padding: var(--padding-md); }
+    .pos-header { font-size: 1.2em; }
+    .input-controls, .bulk-upload-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    #menuTable {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+}
