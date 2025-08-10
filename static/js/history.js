@@ -10,6 +10,11 @@ window.onload = () => {
 let allOrders = [];
 
 function formatItemsForDisplay(items) {
+    if (!items) return "N/A";
+    // If stored as JSON string, parse it
+    if (typeof items === 'string') {
+        try { items = JSON.parse(items); } catch(e) { return items; }
+    }
     if (!Array.isArray(items) || items.length === 0) return "N/A";
     return items.map(item => `${item.name} x${item.qty}`).join(", ");
 }
@@ -33,23 +38,25 @@ async function loadOrders() {
         const res = await fetch(url);
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         const json = await res.json();
+        if (json.status !== 'success') throw new Error(json.message || 'API error');
         allOrders = json.data || [];
 
         const tbody = document.querySelector("#ordersTable tbody");
         tbody.innerHTML = "";
         allOrders.forEach(row => {
             const tr = document.createElement("tr");
-            // Use correct status logic
             tr.className = row.status === "completed" ? "completed" : "pending";
-            // Use correct field names from backend (sub_total, gst, total)
+            const sub = Number(row.sub_total ?? row.subtotal ?? 0);
+            const gst = Number(row.gst ?? 0);
+            const ttl = Number(row.total ?? 0);
             tr.innerHTML = `
                 <td>${row.id}</td>
                 <td>${row.order_type}</td>
                 <td>${row.table_number || 'N/A'}</td>
                 <td>${formatItemsForDisplay(row.items)}</td>
-                <td>${(row.sub_total || 0).toFixed(2)}</td>
-                <td>${(row.gst || 0).toFixed(2)}</td>
-                <td>${(row.total || 0).toFixed(2)}</td>
+                <td>${sub.toFixed(2)}</td>
+                <td>${gst.toFixed(2)}</td>
+                <td>${ttl.toFixed(2)}</td>
                 <td>${formatDateTime(row.date)}</td>
                 <td>${row.status}</td>
                 <td class="action-buttons"><button onclick='openEditModal(${row.id})'>✏️ Edit</button></td>
@@ -70,7 +77,11 @@ function openEditModal(orderId) {
     // Render items as editable rows
     const itemsContainer = document.getElementById("editItemsContainer");
     itemsContainer.innerHTML = "";
-    (order.items || []).forEach((item, idx) => {
+    let items = order.items;
+    if (typeof items === 'string') {
+        try { items = JSON.parse(items); } catch(e) {}
+    }
+    (items || []).forEach((item, idx) => {
         const row = document.createElement("div");
         row.className = "edit-item-row";
         row.innerHTML = `
@@ -80,9 +91,9 @@ function openEditModal(orderId) {
         `;
         itemsContainer.appendChild(row);
     });
-    document.getElementById("editSubtotal").value = order.sub_total;
-    document.getElementById("editGst").value = order.gst;
-    document.getElementById("editTotal").value = order.total;
+    document.getElementById("editSubtotal").value = Number(order.sub_total || 0);
+    document.getElementById("editGst").value = Number(order.gst || 0);
+    document.getElementById("editTotal").value = Number(order.total || 0);
     document.getElementById("editSubtotal").oninput = updateEditTotal;
     document.getElementById("editGst").oninput = updateEditTotal;
     document.getElementById("editModal").style.display = "flex";
