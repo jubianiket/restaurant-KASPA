@@ -360,12 +360,22 @@ function updateTable(items) {
     document.getElementById('totalAmount').textContent = total.toFixed(2);
 }
 
-function clearOrder() {
-    document.querySelector('#orderTable tbody').innerHTML = '';
+function clearOrder(clearId=false) {
+    const key = getCurrentOrderKey();
+    const tbody = document.querySelector('#orderTable tbody');
+    if (tbody) tbody.innerHTML = '';
+    const orderObj = tableOrders[key];
+    if (orderObj && typeof orderObj === 'object') {
+        orderObj.confirmed = [];
+        orderObj.new = [];
+        if (clearId) orderObj.order_id = null;
+    } else {
+        tableOrders[key] = { confirmed: [], new: [], order_id: null };
+    }
     document.getElementById('totalAmount').textContent = '0.00';
     document.getElementById('subtotalAmount').textContent = '0.00';
-    document.getElementById('taxBreakdown').style.display = 'none';
-    tableOrders[getCurrentOrderKey()] = [];
+    const taxEl = document.getElementById('taxBreakdown');
+    if (taxEl) taxEl.style.display = 'none';
     saveStateToLocalStorage();
 }
 
@@ -886,7 +896,7 @@ function applyMobileOptimizations() {
     };
     if (postClose) postClose.onclick = window.closePostSheet;
 
-    if (btnBill) btnBill.onclick = function(){ window.closePostSheet(); try { printBill(); } catch(e){} };
+    if (btnBill) btnBill.onclick = function(){ window.closePostSheet(); try { printBill(); } finally { try { clearOrder(true); } catch(e){} } };
     if (btnAdd) btnAdd.onclick = function(){ window.closePostSheet(); try { openMobileSheet(); } catch(e){} };
 
     // Wrap confirmOrder to show post-confirm sheet on success
