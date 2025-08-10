@@ -613,7 +613,8 @@ function createTableButtons() {
 
             for (let i = 1; i <= totalTables; i++) {
                 const btn = document.createElement('button');
-                btn.textContent = `Table ${i}`;
+                const isMobile = document.body.classList.contains('is-mobile');
+                btn.textContent = isMobile ? `T${i}` : `Table ${i}`;
                 btn.className = 'table-btn';
                 btn.dataset.tableNum = i;
                 btn.onclick = () => selectTable(i);
@@ -849,7 +850,7 @@ function applyMobileOptimizations() {
     const origSelectTable = window.selectTable;
     window.selectTable = function(num){
         if (typeof origSelectTable === 'function') origSelectTable(num);
-        if (isMobile() && !tableChosen) {
+        if (isMobile()) {
             tableChosen = true;
             disableMenu(false);
             try { openMobileSheet(); } catch(e){}
