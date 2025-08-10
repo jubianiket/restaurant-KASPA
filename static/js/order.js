@@ -935,3 +935,59 @@ if (typeof window.openMobileSheet !== 'function') {
         }
     };
 })();
+
+// Enhance post-confirm flow reliability and stacking
+(function reinforcePostConfirmFlow(){
+    const postSheet = document.getElementById('mobilePostConfirmSheet');
+    const cartSheet = document.getElementById('mobileCartSheet');
+    const menuSheet = document.getElementById('mobileMenuSheet');
+    const backdrop = document.getElementById('mobileCartBackdrop');
+
+    function anyOtherOpen() {
+        return (cartSheet && cartSheet.classList.contains('open')) || (menuSheet && menuSheet.classList.contains('open'));
+    }
+
+    // Replace openPostSheet to close other sheets first and ensure backdrop visible
+    if (typeof window.openPostSheet === 'function') {
+        const oldOpen = window.openPostSheet;
+        window.openPostSheet = function(){
+            if (cartSheet) cartSheet.classList.remove('open');
+            if (menuSheet) menuSheet.classList.remove('open');
+            if (postSheet) postSheet.classList.add('open');
+            backdrop && backdrop.classList.add('visible');
+        };
+    }
+
+    // Wrap fetch to detect successful order submits and open post sheet
+    if (window.fetch && !window.__orderFetchWrapped) {
+        const origFetch = window.fetch.bind(window);
+        window.fetch = function(input, init){
+            const url = typeof input === 'string' ? input : (input && input.url) || '';
+            return origFetch(input, init).then(resp => {
+                const shouldCheck = url.includes('/save_order') || url.includes('/append_items');
+                if (!shouldCheck) return resp;
+                resp.clone().json().then(data => {
+                    if (data && data.status === 'success') {
+                        try {
+                            if (cartSheet) cartSheet.classList.remove('open');
+                            if (menuSheet) menuSheet.classList.remove('open');
+                            if (postSheet) postSheet.classList.add('open');
+                            backdrop && backdrop.classList.add('visible');
+                        } catch(e){}
+                    }
+                }).catch(()=>{});
+                return resp;
+            });
+        };
+        window.__orderFetchWrapped = true;
+    }
+
+    // Ensure closePostSheet only hides backdrop if no other sheet open
+    const postClose = document.getElementById('mobilePostClose');
+    if (postClose) {
+        postClose.addEventListener('click', () => {
+            if (postSheet) postSheet.classList.remove('open');
+            if (!anyOtherOpen()) backdrop && backdrop.classList.remove('visible');
+        });
+    }
+})();
