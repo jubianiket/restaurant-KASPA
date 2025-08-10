@@ -157,6 +157,16 @@ def complete_order_by_id(order_id):
     else:
         return jsonify({"status": "error", "message": "Order update failed"}), 400
 
+@app.route("/orders/<int:order_id>/append_items", methods=["POST"])
+@login_required()
+def append_items_route(order_id):
+    data = request.get_json() or {}
+    items = data.get("items") or []
+    ok, msg = append_items_to_order(order_id, items)
+    if ok:
+        return jsonify({"status": "success", "message": msg})
+    return jsonify({"status": "error", "message": msg}), 400
+
 # -------------- Inventory APIs ----------------
 
 @app.route("/api/inventory", methods=["GET", "POST", "PUT", "DELETE"])
