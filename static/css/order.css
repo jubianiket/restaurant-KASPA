@@ -782,3 +782,11 @@ body.is-mobile .table-btn { min-width:auto; padding:10px 12px; font-weight:700; 
 /* Mobile Menu sheet content */
 body.is-mobile #mobileMenuSheet { display: block; }
 body.is-mobile #mobileMenuContent .item-grid { max-height: 55vh; }
+
+/* Item details panel */
+.item-details { margin-top: 10px; padding: 12px; border: 1px dashed var(--border-color); border-radius: 6px; background: #fafafa; min-height: 60px; }
+.item-details .label { font-weight: 700; color: var(--text-color); margin-right: 6px; }
+.item-details .value { color: var(--light-text-color); }
+
+/* Selected row highlight */
+#orderTable tr.selected { background-color: #e6f7ff; }
