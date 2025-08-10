@@ -326,28 +326,24 @@ button:focus {
     }
 }
 
+/* Sticky header */
+.pos-header.sticky { position: sticky; top: 0; z-index: 5; }
+
+/* Table wrapper for horizontal scroll on small screens */
+.table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.table-wrapper table { min-width: 600px; }
+
+/* 9:16 portrait mobile refinements */
 @media (orientation: portrait), (max-aspect-ratio: 9/16), (max-width: 480px) {
-    body { padding: var(--padding-md); }
-    .pos-header { font-size: 1.2em; }
-    .input-controls, .bulk-upload-controls {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    #menuTable {
-        display: block;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-    }
+  body { padding: var(--padding-md); }
+  .pos-header { font-size: 1.2em; }
+  .input-controls, .bulk-upload-controls { flex-direction: column; align-items: stretch; gap: 10px; }
+  .action-buttons { flex-direction: row; gap: 8px; }
+  .action-buttons button { flex: 1; padding: 10px 12px; }
+  .table-wrapper { margin-top: 8px; }
+  #menuTable th, #menuTable td { padding: 10px 12px; font-size: 0.95rem; }
 }
 
-/* JS-scoped mobile layout */
-body.is-mobile .input-controls,
-body.is-mobile .bulk-upload-controls {
-    flex-direction: column;
-    align-items: stretch;
-}
-body.is-mobile #menuTable {
-    display: block;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-}
+/* JS-scoped mobile class support */
+body.is-mobile .table-wrapper { overflow-x: auto; }
+body.is-mobile .table-wrapper table { min-width: 600px; }
