@@ -1,3 +1,13 @@
+(function(){
+  function isMobile(){
+    var w = window.innerWidth, h = window.innerHeight;
+    return w <= 768 || h / Math.max(1, w) >= 16/9;
+  }
+  function apply(){ document.body.classList.toggle('is-mobile', isMobile()); }
+  window.addEventListener('DOMContentLoaded', apply);
+  window.addEventListener('resize', function(){ clearTimeout(window._menuRT); window._menuRT = setTimeout(apply, 100); });
+})();
+
 let selectedId = null;
 
 function fetchMenuItems() {
