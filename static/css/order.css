@@ -774,3 +774,7 @@ body.is-mobile .item-grid { gap: 12px; padding: 0 35px; min-height: 140px; max-h
 
 /* Post-confirm options sheet */
 body.is-mobile #mobilePostConfirmSheet { display: block; }
+
+/* Horizontal table strip on mobile */
+body.is-mobile .tables-grid { display:flex; overflow-x:auto; gap:8px; padding: 6px 8px; }
+body.is-mobile .table-btn { min-width:auto; padding:10px 12px; font-weight:700; }
