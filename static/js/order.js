@@ -292,6 +292,19 @@ function updateTable(items) {
         subtotal += amount;
         const row = document.createElement('tr');
         row.innerHTML = `<td>${item.name}</td><td>${item.qty}</td><td>${item.rate.toFixed(2)}</td><td>${amount.toFixed(2)}</td>`;
+        row.onclick = () => {
+            document.querySelectorAll('#orderTable tbody tr').forEach(r => r.classList.remove('selected'));
+            row.classList.add('selected');
+            const details = document.getElementById('itemDetails');
+            if (details) {
+                details.innerHTML = `
+                    <div><span class='label'>Item:</span> <span class='value'>${item.name}</span></div>
+                    <div><span class='label'>Quantity:</span> <span class='value'>${item.qty}</span></div>
+                    <div><span class='label'>Rate:</span> <span class='value'>₹${item.rate.toFixed(2)}</span></div>
+                    <div><span class='label'>Amount:</span> <span class='value'>₹${amount.toFixed(2)}</span></div>
+                `;
+            }
+        };
         tbody.appendChild(row);
     });
 
