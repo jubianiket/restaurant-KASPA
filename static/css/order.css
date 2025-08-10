@@ -778,3 +778,7 @@ body.is-mobile #mobilePostConfirmSheet { display: block; }
 /* Horizontal table strip on mobile */
 body.is-mobile .tables-grid { display:flex; overflow-x:auto; gap:8px; padding: 6px 8px; }
 body.is-mobile .table-btn { min-width:auto; padding:10px 12px; font-weight:700; }
+
+/* Mobile Menu sheet content */
+body.is-mobile #mobileMenuSheet { display: block; }
+body.is-mobile #mobileMenuContent .item-grid { max-height: 55vh; }

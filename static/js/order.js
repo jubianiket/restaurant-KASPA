@@ -899,3 +899,39 @@ function applyMobileOptimizations() {
 if (typeof window.openMobileSheet !== 'function') {
     window.openMobileSheet = function(){};
 }
+
+// Move menu markup into mobile menu sheet on mobile and control open behavior
+(function initMobileMenuSheet(){
+    const isMobile = () => document.body.classList.contains('is-mobile');
+    const mount = document.getElementById('mobileMenuMount');
+    const menuSheet = document.getElementById('mobileMenuSheet');
+    const menuContent = document.getElementById('mobileMenuContent');
+    const menuClose = document.getElementById('mobileMenuClose');
+    const backdrop = document.getElementById('mobileCartBackdrop');
+
+    function showMenuSheet(){
+        if (!menuSheet || !menuContent || !mount) return;
+        // Mount the menu block inside the sheet
+        if (menuContent.childElementCount === 0) {
+            while (mount.firstChild) menuContent.appendChild(mount.firstChild);
+        }
+        menuSheet.classList.add('open');
+        backdrop && backdrop.classList.add('visible');
+    }
+    function hideMenuSheet(){
+        if (!menuSheet) return;
+        menuSheet.classList.remove('open');
+        backdrop && backdrop.classList.remove('visible');
+    }
+    if (menuClose) menuClose.onclick = hideMenuSheet;
+
+    // Override openMobileSheet to show menu first when selecting items
+    const originalOpenCart = window.openMobileSheet;
+    window.openMobileSheet = function(){
+        if (isMobile()) {
+            showMenuSheet();
+        } else if (typeof originalOpenCart === 'function') {
+            originalOpenCart();
+        }
+    };
+})();
