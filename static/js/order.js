@@ -114,6 +114,10 @@ function toggleOrderType() {
         if (prevSelectedBtn) prevSelectedBtn.classList.remove('selected');
         tableOrders['delivery'] = tableOrders['delivery'] || [];
         updateTable(tableOrders['delivery']);
+        // Mobile: open menu sheet for delivery flow as well
+        if (document.body.classList.contains('is-mobile')) {
+            try { openMobileSheet(); } catch(e){}
+        }
     }
 }
 
@@ -361,19 +365,21 @@ function clearOrder() {
 }
 
 function confirmOrder() {
-    const type = document.querySelector('input[name="orderType"]:checked').value;
-    const currentOrderKey = getCurrentOrderKey();
-    let orderObj = tableOrders[currentOrderKey];
-    let itemsToSend = [];
-    if (type === 'Table') {
-        if (!orderObj || Array.isArray(orderObj)) {
-            orderObj = { confirmed: [], new: [] };
-            tableOrders[currentOrderKey] = orderObj;
+            const type = document.querySelector('input[name="orderType"]:checked').value;
+        const currentOrderKey = getCurrentOrderKey();
+        let orderObj = tableOrders[currentOrderKey];
+        let itemsToSend = [];
+        if (type === 'Table') {
+            if (!orderObj || Array.isArray(orderObj)) {
+                orderObj = { confirmed: [], new: [] };
+                tableOrders[currentOrderKey] = orderObj;
+            }
+            itemsToSend = orderObj.new;
+        } else {
+            // delivery uses a flat array; ensure it exists
+            if (!orderObj) { orderObj = []; tableOrders[currentOrderKey] = orderObj; }
+            itemsToSend = orderObj;
         }
-        itemsToSend = orderObj.new;
-    } else {
-        itemsToSend = orderObj || [];
-    }
 
     if (!itemsToSend || itemsToSend.length === 0) {
         alert('No items in the order.');
@@ -454,7 +460,8 @@ function confirmOrder() {
                     clearOrder();
                 }
                 saveStateToLocalStorage();
-                updateTable([...orderObj.confirmed, ...orderObj.new]);
+                updateTable([...(orderObj.confirmed || []), ...(orderObj.new || [])]);
+                if (typeof window.openPostSheet === 'function') window.openPostSheet();
             } else {
                 alert('Failed to save order');
             }
