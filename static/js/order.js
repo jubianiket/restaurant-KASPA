@@ -617,7 +617,7 @@ function createTableButtons() {
                 btn.textContent = isMobile ? `T${i}` : `Table ${i}`;
                 btn.className = 'table-btn';
                 btn.dataset.tableNum = i;
-                btn.onclick = () => selectTable(i);
+                btn.onclick = () => window.selectTable(i);
                 if (lockedTables.has(i)) btn.classList.add('locked');
                 tableSection.appendChild(btn);
             }
@@ -894,3 +894,8 @@ function applyMobileOptimizations() {
         }, 150);
     };
 })();
+
+// Guard openMobileSheet in case order page is used standalone
+if (typeof window.openMobileSheet !== 'function') {
+    window.openMobileSheet = function(){};
+}
