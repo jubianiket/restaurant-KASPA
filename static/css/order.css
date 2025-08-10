@@ -771,3 +771,6 @@ body.is-mobile .middle-panel .panel-title { display: none; }
 body.is-mobile .category-btns { overflow-x: auto; -webkit-overflow-scrolling: touch; flex-wrap: nowrap; gap: 10px; }
 body.is-mobile .search-box { margin: 8px 0; }
 body.is-mobile .item-grid { gap: 12px; padding: 0 35px; min-height: 140px; max-height: 55vh; }
+
+/* Post-confirm options sheet */
+body.is-mobile #mobilePostConfirmSheet { display: block; }

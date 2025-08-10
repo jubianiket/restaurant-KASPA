@@ -827,3 +827,69 @@ function applyMobileOptimizations() {
         });
     }
 }
+
+// Enforce mobile-first flow: select table -> show menu sheet; after confirm -> post-confirm sheet
+(function initMobileFlow(){
+    const isMobile = () => document.body.classList.contains('is-mobile');
+    const middlePanel = document.querySelector('.middle-panel');
+    let tableChosen = false;
+
+    function disableMenu(disabled){
+        if (!middlePanel) return;
+        middlePanel.style.pointerEvents = disabled ? 'none' : '';
+        middlePanel.style.opacity = disabled ? '0.5' : '';
+    }
+
+    // Initially disable menu until a table is selected on mobile
+    window.addEventListener('DOMContentLoaded', () => {
+        if (isMobile()) disableMenu(true);
+    });
+
+    // Hook into selectTable
+    const origSelectTable = window.selectTable;
+    window.selectTable = function(num){
+        if (typeof origSelectTable === 'function') origSelectTable(num);
+        if (isMobile() && !tableChosen) {
+            tableChosen = true;
+            disableMenu(false);
+            try { openMobileSheet(); } catch(e){}
+        }
+    };
+
+    // Post-confirm sheet wiring
+    const postSheet = document.getElementById('mobilePostConfirmSheet');
+    const postClose = document.getElementById('mobilePostClose');
+    const btnBill = document.getElementById('mobileGenerateBill');
+    const btnAdd = document.getElementById('mobileAddMoreItems');
+
+    function openPostSheet(){
+        if (!postSheet || !isMobile()) return;
+        postSheet.classList.add('open');
+        mobileCartBackdrop && mobileCartBackdrop.classList.add('visible');
+    }
+    function closePostSheet(){
+        if (!postSheet) return;
+        postSheet.classList.remove('open');
+        mobileCartBackdrop && mobileCartBackdrop.classList.remove('visible');
+    }
+    if (postClose) postClose.onclick = closePostSheet;
+
+    if (btnBill) btnBill.onclick = function(){ closePostSheet(); try { printBill(); } catch(e){} };
+    if (btnAdd) btnAdd.onclick = function(){ closePostSheet(); try { openMobileSheet(); } catch(e){} };
+
+    // Wrap confirmOrder to show post-confirm sheet on success
+    const originalConfirm = window.confirmOrder;
+    window.confirmOrder = function(){
+        const prevOrderState = JSON.stringify(tableOrders);
+        originalConfirm();
+        // Poll briefly for state change indicating success
+        let tries = 0; const timer = setInterval(() => {
+            tries++;
+            if (JSON.stringify(tableOrders) !== prevOrderState) {
+                clearInterval(timer);
+                openPostSheet();
+            }
+            if (tries > 20) clearInterval(timer);
+        }, 150);
+    };
+})();
