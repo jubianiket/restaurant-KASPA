@@ -294,6 +294,8 @@ function updateTable(items) {
 
     // Update subtotal display
     document.getElementById('subtotalAmount').textContent = subtotal.toFixed(2);
+    // Update mobile UI running totals early
+    updateMobileCartBar(items, subtotal, subtotal);
 
     // Calculate taxes based on settings - allow both taxes to be applied
     let hasAnyTax = false;
@@ -341,6 +343,10 @@ function updateTable(items) {
     }
     
     console.log('💰 Tax calculation:', { subtotal, vatAmount, cgstAmount, sgstAmount, total });
+    
+    // Update mobile UI final totals and render list
+    updateMobileCartBar(items, subtotal, total);
+    renderMobileCartList(items);
     
     document.getElementById('totalAmount').textContent = total.toFixed(2);
 }
@@ -616,6 +622,7 @@ function createTableButtons() {
             }
             selectTable(selectedTable);
         })
+        .then(() => { try { applyMobileOptimizations(); } catch(e){} })
         .catch(err => console.error('Error fetching table settings:', err));
 }
 
@@ -648,3 +655,241 @@ fetch('/api/settings')
         window.restaurantName = (data.data && data.data.restaurant_name) ? data.data.restaurant_name : 'Restaurant Name';
     })
     .catch(() => { window.restaurantName = 'Restaurant Name'; });
+
+// --- Mobile Android POS UI helpers ---
+const mobileCartBar = document.getElementById('mobileCartBar');
+const mobileFab = document.getElementById('mobileFab');
+const mobileCartSheet = document.getElementById('mobileCartSheet');
+const mobileCartBackdrop = document.getElementById('mobileCartBackdrop');
+const mobileCartList = document.getElementById('mobileCartList');
+const mobileSheetClose = document.getElementById('mobileSheetClose');
+const mobileSheetConfirm = document.getElementById('mobileSheetConfirm');
+const mobileViewCartBtn = document.getElementById('mobileViewCartBtn');
+const mobileConfirmBtn = document.getElementById('mobileConfirmBtn');
+
+function isMobileUI() {
+    return document.body.classList && document.body.classList.contains('is-mobile');
+}
+
+function openMobileSheet() {
+    if (!isMobileUI()) return;
+    mobileCartSheet && mobileCartSheet.classList.add('open');
+    mobileCartBackdrop && mobileCartBackdrop.classList.add('visible');
+}
+
+function closeMobileSheet() {
+    mobileCartSheet && mobileCartSheet.classList.remove('open');
+    mobileCartBackdrop && mobileCartBackdrop.classList.remove('visible');
+}
+
+function updateMobileCartBar(items, subtotal, total) {
+    if (!isMobileUI()) return;
+    try {
+        const count = (items || []).reduce((acc, it) => acc + (it.qty || 0), 0);
+        const totalEl = document.getElementById('mobileCartTotal');
+        const countEl = document.getElementById('mobileCartCount');
+        const subEl = document.getElementById('mobileSubtotal');
+        const grandEl = document.getElementById('mobileGrand');
+        if (totalEl) totalEl.textContent = (total || 0).toFixed(2);
+        if (countEl) countEl.textContent = count;
+        if (subEl) subEl.textContent = (subtotal || 0).toFixed(2);
+        if (grandEl) grandEl.textContent = (total || 0).toFixed(2);
+    } catch (e) { /* no-op */ }
+}
+
+function renderMobileCartList(items) {
+    if (!isMobileUI() || !mobileCartList) return;
+    mobileCartList.innerHTML = '';
+    (items || []).forEach((item, idx) => {
+        const row = document.createElement('div');
+        row.className = 'sheet-item';
+        row.innerHTML = `
+            <div class="name">${item.name}</div>
+            <div class="qty-controls">
+                <button data-idx="${idx}" data-act="dec">-</button>
+                <span>${item.qty}</span>
+                <button data-idx="${idx}" data-act="inc">+</button>
+            </div>`;
+        mobileCartList.appendChild(row);
+    });
+    // Delegate click for qty controls
+    mobileCartList.onclick = (e) => {
+        const btn = e.target.closest('button[data-idx]');
+        if (!btn) return;
+        const act = btn.getAttribute('data-act');
+        const idx = parseInt(btn.getAttribute('data-idx'), 10);
+        const currentOrderKey = getCurrentOrderKey();
+        let orderObj = tableOrders[currentOrderKey];
+        if (!orderObj) return;
+        // Work with combined list mapping back into object structure
+        const combined = [...(orderObj.confirmed || []), ...(orderObj.new || [])];
+        const item = combined[idx];
+        if (!item) return;
+        // Modify qty on 'new' list if exists; otherwise on confirmed list (fallback)
+        const newIndex = (orderObj.new || []).findIndex(i => i.name === item.name);
+        if (act === 'inc') {
+            if (newIndex > -1) orderObj.new[newIndex].qty += 1; else combined[idx].qty += 1;
+        } else if (act === 'dec') {
+            if (newIndex > -1) {
+                orderObj.new[newIndex].qty = Math.max(0, orderObj.new[newIndex].qty - 1);
+                if (orderObj.new[newIndex].qty === 0) orderObj.new.splice(newIndex, 1);
+            } else {
+                combined[idx].qty = Math.max(0, combined[idx].qty - 1);
+            }
+        }
+        // Recompute items based on updated object
+        const nextItems = [...(orderObj.confirmed || []), ...(orderObj.new || [])];
+        updateTable(nextItems);
+        saveStateToLocalStorage();
+        openMobileSheet();
+    };
+}
+
+function bindMobileControls() {
+    if (!mobileFab || !mobileCartBar) return;
+    const open = () => openMobileSheet();
+    mobileFab.onclick = open;
+    if (mobileViewCartBtn) mobileViewCartBtn.onclick = open;
+    if (mobileConfirmBtn) mobileConfirmBtn.onclick = () => confirmOrder();
+    if (mobileSheetConfirm) mobileSheetConfirm.onclick = () => confirmOrder();
+    if (mobileSheetClose) mobileSheetClose.onclick = () => closeMobileSheet();
+    if (mobileCartBackdrop) mobileCartBackdrop.onclick = () => closeMobileSheet();
+}
+
+// Attach on load
+window.addEventListener('DOMContentLoaded', bindMobileControls);
+
+// --- Mobile bottom sheet drag gestures ---
+(function initMobileSheetDrag(){
+    if (!mobileCartSheet || !mobileCartBackdrop) return;
+    let startY = 0; let currentY = 0; let isDragging = false; let sheetHeight = 0;
+
+    function onTouchStart(e){
+        if (!isMobileUI()) return;
+        const touch = e.touches ? e.touches[0] : e;
+        startY = touch.clientY; currentY = startY; isDragging = true;
+        sheetHeight = mobileCartSheet.getBoundingClientRect().height;
+        mobileCartSheet.classList.add('dragging');
+        // If closed, allow partial pull-up gesture only from near the bottom
+        if (!mobileCartSheet.classList.contains('open')) {
+            // Allow drag if user starts near bottom of viewport
+            if (startY < window.innerHeight - 120) { isDragging = false; mobileCartSheet.classList.remove('dragging'); }
+        }
+        e.preventDefault();
+    }
+    function onTouchMove(e){
+        if (!isDragging) return;
+        const touch = e.touches ? e.touches[0] : e;
+        currentY = touch.clientY;
+        const delta = Math.max(0, currentY - startY);
+        // Translate sheet down when dragging down; clamp within its height
+        const translate = Math.min(sheetHeight, delta);
+        mobileCartSheet.style.transform = `translateY(${translate}px)`;
+        // Fade backdrop with progress
+        const progress = Math.min(1, translate / sheetHeight);
+        mobileCartBackdrop.style.opacity = String(1 - progress * 0.8);
+        e.preventDefault();
+    }
+    function onTouchEnd(){
+        if (!isDragging) return;
+        isDragging = false;
+        mobileCartSheet.classList.remove('dragging');
+        const delta = Math.max(0, currentY - startY);
+        mobileCartSheet.style.transform = '';
+        mobileCartBackdrop.style.opacity = '';
+        // Threshold: if dragged more than 30% of height, close; otherwise open
+        if (delta > sheetHeight * 0.3) {
+            closeMobileSheet();
+        } else {
+            openMobileSheet();
+        }
+    }
+
+    // Bind to header for drag handle and content for full-area drag
+    const header = mobileCartSheet.querySelector('.sheet-header');
+    const area = header || mobileCartSheet;
+    area.addEventListener('touchstart', onTouchStart, { passive: false });
+    area.addEventListener('touchmove', onTouchMove, { passive: false });
+    area.addEventListener('touchend', onTouchEnd);
+    area.addEventListener('mousedown', onTouchStart);
+    window.addEventListener('mousemove', onTouchMove);
+    window.addEventListener('mouseup', onTouchEnd);
+})();
+
+// Mobile optimizations: compact table labels and category/menu layout
+function applyMobileOptimizations() {
+    const isMobile = document.body.classList.contains('is-mobile');
+    // Shorten table button labels
+    if (isMobile) {
+        document.querySelectorAll('.table-btn').forEach(btn => {
+            const num = btn.dataset.tableNum || btn.textContent.replace(/\D/g, '');
+            btn.textContent = `T${num}`;
+        });
+    }
+}
+
+// Enforce mobile-first flow: select table -> show menu sheet; after confirm -> post-confirm sheet
+(function initMobileFlow(){
+    const isMobile = () => document.body.classList.contains('is-mobile');
+    const middlePanel = document.querySelector('.middle-panel');
+    let tableChosen = false;
+
+    function disableMenu(disabled){
+        if (!middlePanel) return;
+        middlePanel.style.pointerEvents = disabled ? 'none' : '';
+        middlePanel.style.opacity = disabled ? '0.5' : '';
+    }
+
+    // Initially disable menu until a table is selected on mobile
+    window.addEventListener('DOMContentLoaded', () => {
+        if (isMobile()) disableMenu(true);
+    });
+
+    // Hook into selectTable
+    const origSelectTable = window.selectTable;
+    window.selectTable = function(num){
+        if (typeof origSelectTable === 'function') origSelectTable(num);
+        if (isMobile() && !tableChosen) {
+            tableChosen = true;
+            disableMenu(false);
+            try { openMobileSheet(); } catch(e){}
+        }
+    };
+
+    // Post-confirm sheet wiring
+    const postSheet = document.getElementById('mobilePostConfirmSheet');
+    const postClose = document.getElementById('mobilePostClose');
+    const btnBill = document.getElementById('mobileGenerateBill');
+    const btnAdd = document.getElementById('mobileAddMoreItems');
+
+    function openPostSheet(){
+        if (!postSheet || !isMobile()) return;
+        postSheet.classList.add('open');
+        mobileCartBackdrop && mobileCartBackdrop.classList.add('visible');
+    }
+    function closePostSheet(){
+        if (!postSheet) return;
+        postSheet.classList.remove('open');
+        mobileCartBackdrop && mobileCartBackdrop.classList.remove('visible');
+    }
+    if (postClose) postClose.onclick = closePostSheet;
+
+    if (btnBill) btnBill.onclick = function(){ closePostSheet(); try { printBill(); } catch(e){} };
+    if (btnAdd) btnAdd.onclick = function(){ closePostSheet(); try { openMobileSheet(); } catch(e){} };
+
+    // Wrap confirmOrder to show post-confirm sheet on success
+    const originalConfirm = window.confirmOrder;
+    window.confirmOrder = function(){
+        const prevOrderState = JSON.stringify(tableOrders);
+        originalConfirm();
+        // Poll briefly for state change indicating success
+        let tries = 0; const timer = setInterval(() => {
+            tries++;
+            if (JSON.stringify(tableOrders) !== prevOrderState) {
+                clearInterval(timer);
+                openPostSheet();
+            }
+            if (tries > 20) clearInterval(timer);
+        }, 150);
+    };
+})();

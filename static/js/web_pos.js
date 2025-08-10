@@ -30,10 +30,14 @@ function toggleTheme() {
     document.body.classList.toggle("dark-mode");
 }
 
-// Sidebar collapse/expand functionality
+// Sidebar elements
 const sidebar = document.getElementById("sidebar");
 const main = document.getElementById("mainContent");
 const toggleBtn = document.getElementById("sidebarToggle");
+const mobileToggleBtn = document.getElementById("mobileSidebarToggle");
+const sidebarBackdrop = document.getElementById("sidebarBackdrop");
+const headerEl = document.querySelector(".header");
+const contentFrame = document.getElementById("contentFrame");
 
 function setSidebarCollapsed(collapsed) {
     if (collapsed) {
@@ -47,29 +51,97 @@ function setSidebarCollapsed(collapsed) {
     }
 }
 
+function isMobile() {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const tallNarrow = h / Math.max(1, w) >= 16 / 9;
+    return w <= 768 || tallNarrow;
+}
+
+function applyViewportVars() {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const headerH = headerEl ? headerEl.offsetHeight : 0;
+    document.documentElement.style.setProperty("--vw", `${w}px`);
+    document.documentElement.style.setProperty("--vh", `${h}px`);
+    document.documentElement.style.setProperty("--header-h", `${headerH}px`);
+}
+
+function applyResponsiveClasses() {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const isPortrait = h >= w;
+    const tallNarrow = h / Math.max(1, w) >= 16 / 9;
+    document.body.classList.toggle("is-mobile", isMobile());
+    document.body.classList.toggle("is-portrait", isPortrait);
+    document.body.classList.toggle("is-tall-narrow", tallNarrow);
+}
+
+function openMobileSidebar() {
+    sidebar.classList.add("open");
+    sidebarBackdrop.classList.add("visible");
+    document.body.style.overflow = "hidden";
+}
+
+function closeMobileSidebar() {
+    sidebar.classList.remove("open");
+    sidebarBackdrop.classList.remove("visible");
+    document.body.style.overflow = "";
+}
+
+// Desktop sidebar collapse toggle
 toggleBtn.addEventListener("click", () => {
+    if (isMobile()) {
+        // In mobile, use off-canvas open instead of collapse mode
+        openMobileSidebar();
+        return;
+    }
     const collapsed = sidebar.classList.contains("collapsed");
     setSidebarCollapsed(!collapsed);
 });
 
-function shouldAutoCollapse() {
-    return window.matchMedia("(max-width: 700px), (max-aspect-ratio: 9/16)").matches;
-}
-
-// Apply saved sidebar state on load
-window.addEventListener("DOMContentLoaded", () => {
-    const stored = localStorage.getItem("sidebarCollapsed");
-    if (stored === null) {
-        setSidebarCollapsed(shouldAutoCollapse());
+// Mobile hamburger toggle
+mobileToggleBtn.addEventListener("click", () => {
+    if (sidebar.classList.contains("open")) {
+        closeMobileSidebar();
     } else {
-        setSidebarCollapsed(stored === "1");
+        openMobileSidebar();
     }
 });
 
-window.addEventListener("resize", () => {
-    if (localStorage.getItem("sidebarCollapsed") === null) {
-        setSidebarCollapsed(shouldAutoCollapse());
+// Tap backdrop to close
+sidebarBackdrop.addEventListener("click", () => closeMobileSidebar());
+
+function applyResponsive() {
+    applyViewportVars();
+    applyResponsiveClasses();
+    if (isMobile()) {
+        // Ensure off-canvas by default until opened
+        closeMobileSidebar();
+        // Remove desktop collapsed state to avoid conflicts
+        sidebar.classList.remove("collapsed");
+        main.classList.remove("sidebar-collapsed");
+    } else {
+        // Restore desktop collapsed state from preference
+        sidebarBackdrop.classList.remove("visible");
+        sidebar.classList.remove("open");
+        const stored = localStorage.getItem("sidebarCollapsed");
+        setSidebarCollapsed(stored === "1");
     }
+}
+
+// Apply on load
+window.addEventListener("DOMContentLoaded", () => {
+    applyResponsive();
+});
+
+// Apply on resize (debounced)
+let resizeTimer;
+window.addEventListener("resize", () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+        applyResponsive();
+    }, 100);
 });
 
 // Initial load
