@@ -30,17 +30,19 @@
 
         <div class="middle-panel panel">
             <h3 class="panel-title">Menu Categories</h3>
-            <div class="category-btns" id="categoryButtons"></div>
+            <div id="mobileMenuMount">
+                <div class="category-btns" id="categoryButtons"></div>
 
-            <div class="search-box">
-                <input type="text" id="itemSearch" placeholder="Search menu items..." oninput="renderMenuItems()">
-            </div>
+                <div class="search-box">
+                    <input type="text" id="itemSearch" placeholder="Search menu items..." oninput="renderMenuItems()">
+                </div>
 
-            <h3 class="panel-title">Available Items</h3>
-            <div class="item-scroll-wrapper"> <button class="scroll-arrow left-arrow" onclick="scrollItems('left')">◀</button>
-                <div id="itemGrid" class="item-grid">
-                    </div>
-                <button class="scroll-arrow right-arrow" onclick="scrollItems('right')">▶</button>
+                <h3 class="panel-title">Available Items</h3>
+                <div class="item-scroll-wrapper"> <button class="scroll-arrow left-arrow" onclick="scrollItems('left')">◀</button>
+                    <div id="itemGrid" class="item-grid">
+                        </div>
+                    <button class="scroll-arrow right-arrow" onclick="scrollItems('right')">▶</button>
+                </div>
             </div>
         </div>
 
@@ -112,6 +114,15 @@
     <button id="mobileFab" class="mobile-fab" aria-label="Open cart">🧾</button>
 
     <div id="mobileCartBackdrop" class="mobile-sheet-backdrop"></div>
+
+    <!-- Mobile Menu sheet -->
+    <div id="mobileMenuSheet" class="mobile-cart-sheet">
+        <div class="sheet-header">
+            <span>Select Items</span>
+            <button id="mobileMenuClose" class="close">✕</button>
+        </div>
+        <div id="mobileMenuContent" class="sheet-content"></div>
+    </div>
 
     <!-- Post-confirm options sheet (mobile) -->
     <div id="mobilePostConfirmSheet" class="mobile-cart-sheet">
