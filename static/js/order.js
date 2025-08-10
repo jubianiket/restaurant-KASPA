@@ -751,8 +751,9 @@ function bindMobileControls() {
     const open = () => openMobileSheet();
     mobileFab.onclick = open;
     if (mobileViewCartBtn) mobileViewCartBtn.onclick = open;
-    if (mobileConfirmBtn) mobileConfirmBtn.onclick = () => confirmOrder();
-    if (mobileSheetConfirm) mobileSheetConfirm.onclick = () => confirmOrder();
+    if (mobileConfirmBtn) mobileConfirmBtn.onclick = () => { try { confirmOrder(); } finally { setTimeout(() => { if (typeof window.openPostSheet === 'function') window.openPostSheet(); }, 600); } };
+    if (mobileSheetConfirm) mobileSheetConfirm.onclick = () => { try { confirmOrder(); } finally { setTimeout(() => { if (typeof window.openPostSheet === 'function') window.openPostSheet(); }, 600); } };
+
     if (mobileSheetClose) mobileSheetClose.onclick = () => closeMobileSheet();
     if (mobileCartBackdrop) mobileCartBackdrop.onclick = () => closeMobileSheet();
 }
@@ -890,18 +891,21 @@ function applyMobileOptimizations() {
 
     // Wrap confirmOrder to show post-confirm sheet on success
     const originalConfirm = window.confirmOrder;
-    window.confirmOrder = function(){
-        const prevOrderState = JSON.stringify(tableOrders);
-        originalConfirm();
-        // Poll briefly for state change indicating success
-        let tries = 0; const timer = setInterval(() => {
-            tries++;
-            if (JSON.stringify(tableOrders) !== prevOrderState) {
-                clearInterval(timer);
-                openPostSheet();
-            }
-            if (tries > 20) clearInterval(timer);
-        }, 150);
+    window.confirmOrder = async function(){
+        try {
+            const prevOrderState = JSON.stringify(tableOrders);
+            await originalConfirm();
+            let tries = 0; const timer = setInterval(() => {
+                tries++;
+                if (JSON.stringify(tableOrders) !== prevOrderState) {
+                    clearInterval(timer);
+                    if (typeof window.openPostSheet === 'function') window.openPostSheet();
+                }
+                if (tries > 20) clearInterval(timer);
+            }, 150);
+        } catch (e) {
+            console.error('Confirm failed', e);
+        }
     };
 })();
 
