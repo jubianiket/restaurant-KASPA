@@ -23,6 +23,7 @@ def append_items_to_order(order_id, items):
 from supabase import create_client, Client
 import bcrypt
 import datetime # Import datetime here, it was missing earlier for datetime.datetime.now()
+import json
 
 # Replace with your Supabase credentials
 SUPABASE_URL = "https://iwfunipsnoqfasntaofl.supabase.co"
@@ -94,7 +95,8 @@ def save_order(data):
         db_order_type = "dine-in"
 
     supabase_fields = {
-        "items": data.get("items"),
+        # Always store items as JSON string for consistency
+        "items": json.dumps(data.get("items") or []),
         "table_number": data.get("table_number") if db_order_type == 'dine-in' else None,
         "order_type": db_order_type,
         "status": data.get("status"),
