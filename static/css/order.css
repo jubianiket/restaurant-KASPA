@@ -753,7 +753,7 @@ body.is-mobile .mobile-cart-sheet .sheet-footer .buttons { display:flex; gap:10p
 body.is-mobile .mobile-cart-sheet .sheet-footer .buttons button { flex:1; background:#4CAF50; color:#fff; padding: 10px 14px; border:none; border-radius: 6px; font-weight:700; }
 
 /* Simplify mobile layout for 9:16 */
-/* Keep right panel visible to show table and details */
+body.is-mobile .right-panel { display: none; }
 body.is-mobile .left-panel {
     position: sticky; top: 0; z-index: 5;
     background: #ffffff; padding: 8px 8px 6px 8px; border-bottom: 1px solid var(--border-color);
@@ -770,7 +770,7 @@ body.is-mobile .middle-panel { padding: 10px; }
 body.is-mobile .middle-panel .panel-title { display: none; }
 body.is-mobile .category-btns { overflow-x: auto; -webkit-overflow-scrolling: touch; flex-wrap: nowrap; gap: 10px; }
 body.is-mobile .search-box { margin: 8px 0; }
-body.is-mobile .item-grid { gap: 12px; padding: 0 35px; min-height: 140px; max-height: 35vh; }
+body.is-mobile .item-grid { gap: 12px; padding: 0 35px; min-height: 140px; max-height: 55vh; }
 
 /* Post-confirm options sheet */
 body.is-mobile #mobilePostConfirmSheet { display: block; }
@@ -790,7 +790,3 @@ body.is-mobile #mobileMenuContent .item-grid { max-height: 55vh; }
 
 /* Selected row highlight */
 #orderTable tr.selected { background-color: #e6f7ff; }
-
-/* Force horizontal table strip on mobile */
-body.is-mobile .tables-grid { display: flex !important; flex-wrap: nowrap; gap: 8px; overflow-x: auto; padding: 6px 8px; -webkit-overflow-scrolling: touch; }
-body.is-mobile .tables-grid .table-btn { flex: 0 0 auto; width: auto; min-width: 64px; white-space: nowrap; }

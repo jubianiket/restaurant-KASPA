@@ -284,8 +284,6 @@ function updateTable(items) {
     }
     if (!items || items.length === 0) {
         document.getElementById('totalAmount').textContent = '0.00';
-        const details = document.getElementById('itemDetails');
-        if (details) details.innerHTML = `<div class='placeholder'>Select an item to view details here</div>`;
         return;
     }
 
