@@ -112,8 +112,13 @@ function toggleOrderType() {
         selectedTableLabel.textContent = 'Delivery Order';
         const prevSelectedBtn = document.querySelector('.table-btn.selected');
         if (prevSelectedBtn) prevSelectedBtn.classList.remove('selected');
-        tableOrders['delivery'] = tableOrders['delivery'] || [];
-        updateTable(tableOrders['delivery']);
+        // Ensure delivery uses object structure {confirmed, new, order_id}
+        let orderObj = tableOrders['delivery'];
+        if (!orderObj || Array.isArray(orderObj)) {
+            orderObj = { confirmed: [], new: [], order_id: null };
+            tableOrders['delivery'] = orderObj;
+        }
+        updateTable([...(orderObj.confirmed || []), ...(orderObj.new || [])]);
         // Mobile: open menu sheet for delivery flow as well
         if (document.body.classList.contains('is-mobile')) {
             try { openMobileSheet(); } catch(e){}
@@ -365,21 +370,15 @@ function clearOrder() {
 }
 
 function confirmOrder() {
-            const type = document.querySelector('input[name="orderType"]:checked').value;
-        const currentOrderKey = getCurrentOrderKey();
-        let orderObj = tableOrders[currentOrderKey];
-        let itemsToSend = [];
-        if (type === 'Table') {
-            if (!orderObj || Array.isArray(orderObj)) {
-                orderObj = { confirmed: [], new: [] };
-                tableOrders[currentOrderKey] = orderObj;
-            }
-            itemsToSend = orderObj.new;
-        } else {
-            // delivery uses a flat array; ensure it exists
-            if (!orderObj) { orderObj = []; tableOrders[currentOrderKey] = orderObj; }
-            itemsToSend = orderObj;
-        }
+    const type = document.querySelector('input[name="orderType"]:checked').value;
+    const currentOrderKey = getCurrentOrderKey();
+    let orderObj = tableOrders[currentOrderKey];
+    // Normalize structure for both Table and Delivery
+    if (!orderObj || Array.isArray(orderObj)) {
+        orderObj = { confirmed: [], new: [], order_id: null };
+        tableOrders[currentOrderKey] = orderObj;
+    }
+    const itemsToSend = orderObj.new;
 
     if (!itemsToSend || itemsToSend.length === 0) {
         alert('No items in the order.');
@@ -390,8 +389,7 @@ function confirmOrder() {
     let gst = 0, cgst = 0, sgst = 0;
     const gstToggle = document.getElementById('gstToggle');
     const cgstSgstToggle = document.getElementById('cgstSgstToggle');
-    
-    // Calculate taxes - allow both to be applied
+
     if (gstToggle && gstToggle.checked) {
         gst = subtotal * vatSetting / 100;
     }
@@ -401,8 +399,8 @@ function confirmOrder() {
     }
     const total = subtotal + gst + cgst + sgst;
 
-    if (type === 'Table' && orderObj.order_id) {
-        // Existing order: append items
+    if (orderObj.order_id) {
+        // Append items to an existing order (both Table and Delivery)
         fetch(`/orders/${orderObj.order_id}/append_items`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -411,20 +409,19 @@ function confirmOrder() {
         .then(res => res.json())
         .then(data => {
             if (data.status === 'success') {
-                console.log('✅ Items appended to order:', orderObj.order_id);
-                lockTable(selectedTable);
-                // Merge new items into confirmed
+                if (type === 'Table') lockTable(selectedTable);
                 orderObj.confirmed = [...orderObj.confirmed, ...orderObj.new];
                 orderObj.new = [];
                 saveStateToLocalStorage();
-                updateTable([...orderObj.confirmed, ...orderObj.new]);
+                updateTable([...(orderObj.confirmed || []), ...(orderObj.new || [])]);
+                if (typeof window.openPostSheet === 'function') window.openPostSheet();
             } else {
                 alert('Failed to append items');
             }
         })
         .catch(err => console.error('Error appending items:', err));
     } else {
-        // New order
+        // Create a new order
         const order = {
             order_type: type,
             table_number: type === 'Table' ? selectedTable : 0,
@@ -447,18 +444,14 @@ function confirmOrder() {
         .then(res => res.json())
         .then(data => {
             if (data.status === 'success') {
-                console.log('✅ Order saved with ID:', data.order_id);
                 if (type === 'Table') {
                     lockTable(selectedTable);
-                    if (data.order_id) {
-                        // Merge new items into confirmed, keep order_id
-                        orderObj.confirmed = [...orderObj.confirmed, ...orderObj.new];
-                        orderObj.new = [];
-                        orderObj.order_id = data.order_id;
-                    }
-                } else {
-                    clearOrder();
                 }
+                if (data.order_id) {
+                    orderObj.order_id = data.order_id;
+                }
+                orderObj.confirmed = [...orderObj.confirmed, ...orderObj.new];
+                orderObj.new = [];
                 saveStateToLocalStorage();
                 updateTable([...(orderObj.confirmed || []), ...(orderObj.new || [])]);
                 if (typeof window.openPostSheet === 'function') window.openPostSheet();
