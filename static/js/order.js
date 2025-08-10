@@ -863,20 +863,30 @@ function applyMobileOptimizations() {
     const btnBill = document.getElementById('mobileGenerateBill');
     const btnAdd = document.getElementById('mobileAddMoreItems');
 
-    function openPostSheet(){
+    window.openPostSheet = function(){
         if (!postSheet || !isMobile()) return;
+        // Close other sheets to ensure visibility
+        try {
+            const cartSheet = document.getElementById('mobileCartSheet');
+            const menuSheet = document.getElementById('mobileMenuSheet');
+            if (cartSheet) cartSheet.classList.remove('open');
+            if (menuSheet) menuSheet.classList.remove('open');
+        } catch(e){}
         postSheet.classList.add('open');
         mobileCartBackdrop && mobileCartBackdrop.classList.add('visible');
-    }
-    function closePostSheet(){
+    };
+    window.closePostSheet = function(){
         if (!postSheet) return;
         postSheet.classList.remove('open');
-        mobileCartBackdrop && mobileCartBackdrop.classList.remove('visible');
-    }
-    if (postClose) postClose.onclick = closePostSheet;
+        // Keep backdrop if other sheet is open
+        const cartOpen = document.getElementById('mobileCartSheet')?.classList.contains('open');
+        const menuOpen = document.getElementById('mobileMenuSheet')?.classList.contains('open');
+        if (!cartOpen && !menuOpen) mobileCartBackdrop && mobileCartBackdrop.classList.remove('visible');
+    };
+    if (postClose) postClose.onclick = window.closePostSheet;
 
-    if (btnBill) btnBill.onclick = function(){ closePostSheet(); try { printBill(); } catch(e){} };
-    if (btnAdd) btnAdd.onclick = function(){ closePostSheet(); try { openMobileSheet(); } catch(e){} };
+    if (btnBill) btnBill.onclick = function(){ window.closePostSheet(); try { printBill(); } catch(e){} };
+    if (btnAdd) btnAdd.onclick = function(){ window.closePostSheet(); try { openMobileSheet(); } catch(e){} };
 
     // Wrap confirmOrder to show post-confirm sheet on success
     const originalConfirm = window.confirmOrder;
