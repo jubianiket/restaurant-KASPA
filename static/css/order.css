@@ -790,7 +790,3 @@ body.is-mobile #mobileMenuContent .item-grid { max-height: 55vh; }
 
 /* Selected row highlight */
 #orderTable tr.selected { background-color: #e6f7ff; }
-
-/* Force horizontal table strip on mobile */
-body.is-mobile .tables-grid { display: flex !important; flex-wrap: nowrap; gap: 8px; overflow-x: auto; padding: 6px 8px; -webkit-overflow-scrolling: touch; }
-body.is-mobile .tables-grid .table-btn { flex: 0 0 auto; width: auto; min-width: 64px; white-space: nowrap; }
