@@ -1,0 +1,13 @@
+{
+  "name": "restaurant-kaspa",
+  "version": "1.0.0",
+  "description": "Restaurant KASPA - Node.js version for Vercel",
+  "main": "api/index.js",
+  "scripts": {
+    "dev": "vercel dev",
+    "start": "node api/index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
