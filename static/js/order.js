@@ -445,6 +445,7 @@ function confirmOrder() {
                 updateTable([...(orderObj.confirmed || []), ...(orderObj.new || [])]);
                 if (typeof window.openPostSheet === 'function') window.openPostSheet();
                 try { parent.reloadHistoryIfVisible && parent.reloadHistoryIfVisible(); } catch(e){}
+                console.log('Order appended and UI updated');
             } else {
                 alert('Failed to append items');
             }
@@ -491,6 +492,7 @@ function confirmOrder() {
                 updateTable([...(orderObj.confirmed || []), ...(orderObj.new || [])]);
                 if (typeof window.openPostSheet === 'function') window.openPostSheet();
                 try { parent.reloadHistoryIfVisible && parent.reloadHistoryIfVisible(); } catch(e){}
+                console.log('Order saved and UI updated');
             } else {
                 alert('Failed to save order');
             }
