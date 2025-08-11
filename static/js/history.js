@@ -11,11 +11,19 @@ let allOrders = [];
 
 function formatItemsForDisplay(items) {
     if (!items) return "N/A";
-    // If stored as JSON string, parse it
+
+    // First parse if it's a string
     if (typeof items === 'string') {
         try { items = JSON.parse(items); } catch(e) { return items; }
     }
+
+    // If it's still a string after first parse, try parsing again (double-encoded case)
+    if (typeof items === 'string') {
+        try { items = JSON.parse(items); } catch(e) { return items; }
+    }
+
     if (!Array.isArray(items) || items.length === 0) return "N/A";
+
     return items.map(item => `${item.name} x${item.qty}`).join(", ");
 }
 
@@ -81,6 +89,9 @@ function openEditModal(orderId) {
     if (typeof items === 'string') {
         try { items = JSON.parse(items); } catch(e) {}
     }
+    if (typeof items === 'string') {
+    try { items = JSON.parse(items); } catch(e) {}
+}
     (items || []).forEach((item, idx) => {
         const row = document.createElement("div");
         row.className = "edit-item-row";
