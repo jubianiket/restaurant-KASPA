@@ -187,11 +187,5 @@ function formatDateTime(dateStr) {
     return `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss} ${ampm}`;
 }
 
-window.onload = () => {
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('toDate').value = today;
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    document.getElementById('fromDate').value = thirtyDaysAgo.toISOString().split('T')[0];
-    loadOrders();
-};
+// Expose reloader globally for cross-page refresh triggers
+window.reloadOrderHistory = loadOrders;

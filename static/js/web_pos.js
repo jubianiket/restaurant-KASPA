@@ -1,5 +1,6 @@
 function loadPage(path) {
-    document.getElementById("contentFrame").src = path;
+    const frame = document.getElementById("contentFrame");
+    frame.src = path;
 }
 
 function updateClock() {
@@ -28,6 +29,16 @@ function fetchSettings() {
 
 function toggleTheme() {
     document.body.classList.toggle("dark-mode");
+}
+
+function reloadHistoryIfVisible() {
+    try {
+        const frame = document.getElementById("contentFrame");
+        const url = new URL(frame.src, window.location.origin);
+        if (url.pathname === "/history" && frame.contentWindow && frame.contentWindow.reloadOrderHistory) {
+            frame.contentWindow.reloadOrderHistory();
+        }
+    } catch (e) {}
 }
 
 // Sidebar elements
