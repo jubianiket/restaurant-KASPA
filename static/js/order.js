@@ -444,6 +444,7 @@ function confirmOrder() {
                 saveStateToLocalStorage();
                 updateTable([...(orderObj.confirmed || []), ...(orderObj.new || [])]);
                 if (typeof window.openPostSheet === 'function') window.openPostSheet();
+                try { parent.reloadHistoryIfVisible && parent.reloadHistoryIfVisible(); } catch(e){}
             } else {
                 alert('Failed to append items');
             }
@@ -489,6 +490,7 @@ function confirmOrder() {
                 saveStateToLocalStorage();
                 updateTable([...(orderObj.confirmed || []), ...(orderObj.new || [])]);
                 if (typeof window.openPostSheet === 'function') window.openPostSheet();
+                try { parent.reloadHistoryIfVisible && parent.reloadHistoryIfVisible(); } catch(e){}
             } else {
                 alert('Failed to save order');
             }
@@ -497,7 +499,7 @@ function confirmOrder() {
     }
 }
 
-function printBill() {
+async function printBill() {
     var paperSize = document.getElementById('paperSize') ? document.getElementById('paperSize').value : '80';
     var widthPx = paperSize === '80' ? 300 : 220;
     var printWindow = window.open('', '', 'width=' + widthPx + ',height=600');
@@ -514,6 +516,20 @@ function printBill() {
     printWindow.document.write('@media print { body { margin: 0; } }');
     printWindow.document.write('</style>');
     printWindow.document.write('</head><body>');
+
+    try {
+        // Mark as completed in backend for the relevant table/delivery
+        const type = document.querySelector('input[name="orderType"]:checked').value;
+        const currentOrderKey = getCurrentOrderKey();
+        const orderObj = tableOrders[currentOrderKey];
+        const orderId = orderObj && orderObj.order_id;
+        if (orderId) {
+            await fetch(`/orders/${orderId}/complete`, { method: 'POST' });
+        } else if (type === 'Table') {
+            // Fallback: complete by table number
+            await fetch(`/orders/${selectedTable}/pay`, { method: 'POST' });
+        }
+    } catch (e) { console.warn('Failed to mark order completed before print:', e); }
 
     // Restaurant Name
     var restaurantName = '<div style="text-align:center;font-size:16px;font-weight:bold;margin-bottom:8px;">' + (window.restaurantName || 'Restaurant Name') + '</div>';
