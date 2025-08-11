@@ -1,0 +1,18 @@
+/*
+  --- Unified Color Scheme Reference ---
+  Main background: #f4f7f6
+  Main text: #333
+  Headings: #2c3e50
+  Primary button: #4CAF50 (hover: #388e3c)
+  Danger button: #dc3545 (hover: #c82333)
+  Table header: #f0f0f0
+  Modal border: #4CAF50
+*/
+body { font-family: 'Segoe UI', sans-serif; padding: 20px; background: #fff; }
+        h2 { margin-bottom: 20px; }
+        .form-group { margin-bottom: 10px; }
+        input, select { padding: 8px; margin-right: 10px; }
+        button { padding: 10px 15px; background: #4CAF50; color: white; border: none; cursor: pointer; }
+        table { margin-top: 20px; width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px; border: 1px solid #ccc; text-align: left; }
+        th { background-color: #f2f2f2; }

@@ -1,0 +1,74 @@
+<!-- templates/html/history.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order History</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/history.css">
+</head>
+<body>
+    <div class="pos-container">
+        <header class="pos-header">
+            <h1>Order History</h1>
+        </header>
+        <div class="left-panel panel">
+            <!-- Optionally add navigation or summary here -->
+        </div>
+        <div class="middle-panel panel">
+            <div class="controls">
+                <label>From: <input type="date" id="fromDate"></label>
+                <label>To: <input type="date" id="toDate"></label>
+                <button onclick="loadOrders()">🔍 Filter</button>
+                <button onclick="exportToExcel()">📄 Export to Excel</button>
+            </div>
+            <div class="table-scroll">
+                <table id="ordersTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Type</th>
+                            <th>Table</th>
+                            <th>Items</th>
+                            <th>Subtotal</th>
+                            <th>GST</th>
+                            <th>Total</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="right-panel panel">
+            <!-- Optionally add filters, stats, or quick actions here -->
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <h3>Edit Order</h3>
+            <input type="hidden" id="editOrderId">
+            <label>Items:</label>
+            <div id="editItemsContainer"></div>
+            <label for="editSubtotal">Subtotal:</label>
+            <input type="number" id="editSubtotal" step="0.01"><br>
+            <label for="editGst">GST:</label>
+            <input type="number" id="editGst" step="0.01"><br>
+            <label for="editTotal">Total:</label>
+            <input type="number" id="editTotal" step="0.01" readonly><br><br>
+            <div class="modal-buttons">
+                <button onclick="saveOrderEdit()">💾 Save</button>
+                <button onclick="closeEditModal()">❌ Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/history.js"></script>
+</body>
+</html>

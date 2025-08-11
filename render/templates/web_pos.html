@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Restaurant Web Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/web_pos.css') }}">
+</head>
+<body>
+
+    <div class="sidebar" id="sidebar">
+        <button id="sidebarToggle">☰</button>
+        <h2 id="restaurantName">Restaurant</h2>
+        <div id="clock">⏰ Loading...</div>
+        <div id="salesSummary" style="margin-top: 20px;"></div>
+
+        <button onclick="loadPage('/menu')"><span class="icon">📋</span> <span class="sidebar-label">Menu Management</span></button>
+        <button onclick="loadPage('/order')"><span class="icon">🧾</span> <span class="sidebar-label">Take Order</span></button>
+        <button onclick="loadPage('/history')"><span class="icon">📜</span> <span class="sidebar-label">Order History</span></button>
+        <button onclick="loadPage('/inventory')"><span class="icon">📦</span> <span class="sidebar-label">Manage Inventory</span></button>
+        <button onclick="loadPage('/settings')"><span class="icon">⚙️</span> <span class="sidebar-label">Settings</span></button>
+        <button onclick="loadPage('/staff')"><span class="icon">👥</span> <span class="sidebar-label">Add Staff</span></button>
+        <button onclick="toggleTheme()"><span class="icon">🎨</span> <span class="sidebar-label">Toggle Theme</span></button>
+        <a href="/logout" class="logout-link">🚪 <span class="sidebar-label">Logout</span></a>
+    </div>
+
+    <div class="main" id="mainContent">
+        <div class="header">
+            <button id="mobileSidebarToggle" class="mobile-toggle" aria-label="Open menu">☰</button>
+            <h1>🍽️ Welcome to <span id="welcomeRestaurant">Restaurant</span></h1>
+        </div>
+
+        <div class="card">
+            <iframe id="contentFrame" src=""></iframe>
+        </div>
+    </div>
+
+    <div id="sidebarBackdrop" class="sidebar-backdrop"></div>
+
+    <script src="{{ url_for('static', filename='js/web_pos.js') }}"></script>
+</body>
+</html>

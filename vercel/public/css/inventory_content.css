@@ -1,0 +1,58 @@
+/*
+  --- Unified Color Scheme Reference ---
+  Main background: #f4f7f6
+  Main text: #333
+  Headings: #2c3e50
+  Primary button: #4CAF50 (hover: #388e3c)
+  Danger button: #dc3545 (hover: #c82333)
+  Table header: #f0f0f0
+  Modal border: #4CAF50
+*/
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f9f9f9;
+    margin: 0;
+    padding: 20px;
+}
+h1 {
+    font-size: 24px;
+    margin-bottom: 15px;
+}
+.form-group {
+    margin-bottom: 10px;
+}
+.form-group input {
+    padding: 6px;
+    margin-right: 10px;
+}
+button {
+    padding: 8px 12px;
+    margin: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 4px;
+    border: none;
+}
+.btn-add { background-color: #4CAF50; color: white; }
+.btn-update { background-color: #2196F3; color: white; }
+.btn-refresh { background-color: #777; color: white; }
+.btn-delete { background-color: #e53935; color: white; }
+.btn-export { background-color: #ff9800; color: white; }
+.btn-import { background-color: #9c27b0; color: white; }
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: white;
+}
+th, td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+th {
+    background-color: #f2f2f2;
+}
+input[type="file"] {
+    margin-top: 5px;
+}

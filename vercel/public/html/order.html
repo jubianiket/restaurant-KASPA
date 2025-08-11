@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant POS - Order</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/order.css') }}">
+</head>
+<body>
+    <div class="pos-container">
+        <header class="pos-header">
+            <h1>Take Order</h1>
+            <div class="order-type">
+                <input type="radio" id="orderTypeTable" name="orderType" value="Table" checked onchange="toggleOrderType()">
+                <label for="orderTypeTable">Table Order</label>
+                <input type="radio" id="orderTypeDelivery" name="orderType" value="Delivery" onchange="toggleOrderType()">
+                <label for="orderTypeDelivery">Delivery Order</label>
+            </div>
+        </header>
+
+        <div class="left-panel panel">
+            <h3 class="panel-title">Select Table</h3>
+            <div id="tableSection" class="tables-grid"></div>
+            <div id="deliverySection" class="hidden">
+                <input type="text" id="phone" placeholder="Customer Phone Number">
+                <input type="text" id="address" placeholder="Delivery Address">
+            </div>
+        </div>
+
+        <div class="middle-panel panel">
+            <h3 class="panel-title">Menu Categories</h3>
+            <div id="mobileMenuMount">
+                <div class="category-btns" id="categoryButtons"></div>
+
+                <div class="search-box">
+                    <input type="text" id="itemSearch" placeholder="Search menu items..." oninput="renderMenuItems()">
+                </div>
+
+                <h3 class="panel-title">Available Items</h3>
+                <div class="item-scroll-wrapper"> <button class="scroll-arrow left-arrow" onclick="scrollItems('left')">◀</button>
+                    <div id="itemGrid" class="item-grid">
+                        </div>
+                    <button class="scroll-arrow right-arrow" onclick="scrollItems('right')">▶</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="right-panel panel">
+            <h3 id="selectedTableLabel">Table 1 Order</h3>
+
+
+
+            <div class="gst-toggle-container">
+                <div style="font-size: 0.9em; color: #666; margin-bottom: 8px;">Select tax types to apply:</div>
+                <label><input type="checkbox" id="gstToggle" onchange="updateTaxDisplay()"> Apply VAT</label>
+                <span id="gstValueDisplay">(VAT: <span id="gstValue">0</span>%)</span>
+                <br>
+                <label><input type="checkbox" id="cgstSgstToggle" onchange="updateTaxDisplay()"> Apply CGST/SGST</label>
+                <span id="cgstValueDisplay">(CGST: <span id="cgstValue">0</span>%)</span>
+                <span id="sgstValueDisplay">(SGST: <span id="sgstValue">0</span>%)</span>
+                <div style="font-size: 0.8em; color: #888; margin-top: 5px; font-style: italic;">Both taxes can be applied together</div>
+            </div>
+
+            <table id="orderTable">
+                <thead>
+                    <tr><th>Item</th><th>Qty</th><th>Rate</th><th>Amount</th></tr>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
+
+            <div id="itemDetails" class="item-details">
+                <div class="placeholder">Select an item to view details here</div>
+            </div>
+
+            <div class="remove-multi-select">
+                <button onclick="removeSelected()">Remove Selected</button>
+                <label><input type="checkbox" id="multiSelect"> Multi Select</label>
+            </div>
+
+            <div class="summary">
+                <div>Subtotal: ₹<span id="subtotalAmount">0.00</span></div>
+                <div id="taxBreakdown" style="display: none;">
+                    <div id="vatLine" style="display: none;">VAT (<span id="vatRate">0</span>%): ₹<span id="vatAmount">0.00</span></div>
+                    <div id="cgstLine" style="display: none;">CGST (<span id="cgstRate">0</span>%): ₹<span id="cgstAmount">0.00</span></div>
+                    <div id="sgstLine" style="display: none;">SGST (<span id="sgstRate">0</span>%): ₹<span id="sgstAmount">0.00</span></div>
+                </div>
+                <div style="font-weight: bold; font-size: 1.1em; margin-top: 5px;">Total: ₹<span id="totalAmount">0.00</span></div>
+            </div>
+            <div class="paper-size-select" style="margin-bottom:10px;">
+                <label for="paperSize">Paper Size:</label>
+                <select id="paperSize">
+                    <option value="80">80 mm</option>
+                    <option value="59">59 mm</option>
+                </select>
+            </div>
+
+            <div class="action-buttons">
+                <button onclick="confirmOrder()">Confirm Order</button>
+                <button onclick="printBill()">Print Bill</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile-only Android POS UI elements -->
+    <div id="mobileCartBar" class="mobile-cart-bar">
+        <div class="info">
+            <div class="label">Cart</div>
+            <div class="total">₹<span id="mobileCartTotal">0.00</span> • <span id="mobileCartCount">0</span> items</div>
+        </div>
+        <div class="actions">
+            <button id="mobileViewCartBtn" type="button">View</button>
+            <button id="mobileConfirmBtn" type="button">Confirm</button>
+        </div>
+    </div>
+
+    <button id="mobileFab" class="mobile-fab" aria-label="Open cart">🧾</button>
+
+    <div id="mobileCartBackdrop" class="mobile-sheet-backdrop"></div>
+
+    <!-- Mobile Menu sheet -->
+    <div id="mobileMenuSheet" class="mobile-cart-sheet">
+        <div class="sheet-header">
+            <span>Select Items</span>
+            <button id="mobileMenuClose" class="close">✕</button>
+        </div>
+        <div id="mobileMenuContent" class="sheet-content"></div>
+    </div>
+
+    <!-- Post-confirm options sheet (mobile) -->
+    <div id="mobilePostConfirmSheet" class="mobile-cart-sheet">
+        <div class="sheet-header">
+            <span>Order Options</span>
+            <button id="mobilePostClose" class="close">✕</button>
+        </div>
+        <div class="sheet-content">
+            <p>What would you like to do next?</p>
+        </div>
+        <div class="sheet-footer">
+            <div class="buttons">
+                <button id="mobileGenerateBill" type="button">Generate Bill</button>
+                <button id="mobileAddMoreItems" type="button">Add More Items</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="mobileCartSheet" class="mobile-cart-sheet">
+        <div class="sheet-header">
+            <span>Order Cart</span>
+            <button id="mobileSheetClose" class="close">✕</button>
+        </div>
+        <div id="mobileCartList" class="sheet-content">
+            <!-- items injected here -->
+        </div>
+        <div class="sheet-footer">
+            <div class="totals">
+                <div>Subtotal: ₹<span id="mobileSubtotal">0.00</span></div>
+                <div class="taxes">Taxes shown as per selection above</div>
+                <div class="grand">Total: ₹<span id="mobileGrand">0.00</span></div>
+            </div>
+            <div class="buttons">
+                <button id="mobileSheetConfirm" type="button">Confirm Order</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    (function(){
+        function isMobile(){
+            var w = window.innerWidth, h = window.innerHeight;
+            return w <= 768 || h / Math.max(1, w) >= 16/9;
+        }
+        function apply(){
+            var m = isMobile();
+            document.body.classList.toggle('is-mobile', m);
+            document.documentElement.style.setProperty('--vh', window.innerHeight + 'px');
+        }
+        window.addEventListener('DOMContentLoaded', apply);
+        window.addEventListener('resize', function(){ clearTimeout(window._ordRT); window._ordRT = setTimeout(apply, 100); });
+    })();
+    </script>
+    <script src="{{ url_for('static', filename='js/order.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,349 @@
+/*
+ * --- Unified Color Scheme Reference (Refined for a Sleeker Look with Fancy Buttons and Proper Layout) ---
+ * Main background: #f0f2f5 (A soft, cool grey background)
+ * Main container background: #ffffff (Pure white for the main card)
+ * Main text: #343a40 (Dark, professional text color)
+ * Headings: #2c3e50 (Stronger heading color for emphasis)
+ * Header Background: #28a745 (A professional, vibrant green)
+ * Input/Button Section Background: #e9ecef (Very light grey for controls section)
+ * Input fields background: #ffffff
+ * Primary button (Add, Upload Excel): Gradient Green
+ * Update button: Gradient Blue
+ * Delete button: Gradient Red
+ * Table header: #e9ecef (Matching controls section background)
+ * Table row (even): #f8f9fa (Very light grey for subtle stripe)
+ * Table border: #dee2e6 (Light grey, subtle borders)
+ */
+
+:root {
+    --body-bg: #f0f2f5;
+    --container-bg: #ffffff;
+    --header-bg: #28a745; /* Professional green */
+    --header-text-color: #ffffff;
+    --controls-bg: #e9ecef; /* Light grey for control sections */
+    --input-bg: #ffffff;
+    --input-border: #ced4da; /* Slightly darker input border */
+    --text-color: #343a40; /* Dark, professional text */
+    --heading-color: #2c3e50; /* Stronger heading */
+
+    /* Fancy Button Gradients & Hover Colors */
+    --add-btn-gradient-start: #2ecc71; /* Brighter green for top of gradient */
+    --add-btn-gradient-end: #27ae60;   /* Slightly darker green for bottom of gradient */
+    --add-btn-hover-bg: #218838;       /* Solid darker green for hover */
+
+    --update-btn-gradient-start: #3498db; /* Brighter blue */
+    --update-btn-gradient-end: #2980b9;
+    --update-btn-hover-bg: #0056b3;     /* Solid darker blue for hover */
+    --update-btn-text: #ffffff;         /* White text for blue button */
+
+    --delete-btn-gradient-start: #e74c3c; /* Brighter red */
+    --delete-btn-gradient-end: #c0392b;
+    --delete-btn-hover-bg: #c82333;     /* Solid darker red for hover */
+
+    /* Button Shadow Effects */
+    --button-shadow-initial: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --button-shadow-hover: 0 6px 12px rgba(0, 0, 0, 0.2);
+    --button-shadow-active: 0 2px 4px rgba(0, 0, 0, 0.15);
+
+    /* General Spacing & Borders */
+    --border-radius-sm: 0.25rem; /* 4px */
+    --border-radius-md: 0.5rem; /* 8px for main card */
+    --padding-sm: 0.5rem; /* 8px */
+    --padding-md: 0.75rem; /* 12px */
+    --padding-lg: 1.25rem; /* 20px */
+    --margin-sm: 1rem; /* 16px for general spacing */
+    --gap-sm: 0.75rem; /* 12px gap between flex items */
+}
+
+body {
+    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background-color: var(--body-bg);
+    color: var(--text-color);
+    padding: var(--padding-lg);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+}
+
+.pos-container {
+    width: 100%;
+    max-width: 1200px;
+    background-color: var(--container-bg);
+    box-shadow: var(--shadow-md);
+    border-radius: var(--border-radius-md);
+    overflow: hidden;
+    margin-bottom: var(--margin-sm);
+}
+
+.pos-header {
+    background-color: var(--header-bg);
+    color: var(--header-text-color);
+    padding: var(--padding-md) var(--padding-lg);
+    font-size: 1.6em;
+    font-weight: 600;
+    text-align: center;
+    letter-spacing: 0.05em;
+}
+
+.pos-header h1 {
+    margin: 0;
+    font-size: 1em;
+    color: inherit;
+}
+
+/* Common styling for input/button sections */
+.input-controls,
+.bulk-upload-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center; /* Aligns items vertically in the center */
+    gap: var(--gap-sm);
+    padding: var(--padding-md) var(--padding-lg);
+    background-color: var(--controls-bg);
+    color: var(--text-color);
+    border-bottom: 1px solid var(--table-border-color);
+}
+
+/* New style for the button group */
+.action-buttons {
+    display: flex;
+    gap: var(--gap-sm); /* Spacing between the Add, Update, Delete buttons */
+    /* Allows the button group to wrap to a new line if inputs take too much space */
+    flex-wrap: wrap;
+    /* This makes the button group stay together and not break apart */
+    /* flex-shrink: 0; */ /* No need if it's wrapping */
+    /* flex-grow: 0; */ /* Can grow if needed, or stay fixed */
+}
+
+
+/* Input field styling */
+input[type="text"],
+input[type="number"] {
+    padding: var(--padding-sm);
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--input-border);
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    flex-grow: 1; /* Inputs can grow to fill space */
+    min-width: 120px;
+    box-sizing: border-box;
+    font-size: 0.95rem;
+}
+
+input::placeholder {
+    color: #6c757d;
+    opacity: 0.8;
+}
+
+/* File input button styling */
+input[type="file"] {
+    flex-grow: 0;
+    width: auto;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: transparent;
+    cursor: pointer;
+}
+
+input[type="file"]::-webkit-file-upload-button {
+    background-image: linear-gradient(to bottom, var(--add-btn-gradient-start), var(--add-btn-gradient-end));
+    background-color: var(--add-btn-gradient-end); /* Fallback */
+    color: var(--header-text-color);
+    padding: var(--padding-sm) var(--padding-md);
+    border: none;
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    margin-right: var(--gap-sm);
+    font-weight: 600;
+    box-shadow: var(--button-shadow-initial);
+    transition: all 0.2s ease-in-out;
+}
+
+input[type="file"]::-webkit-file-upload-button:hover {
+    background-image: none;
+    background-color: var(--add-btn-hover-bg);
+    box-shadow: var(--button-shadow-hover);
+}
+
+input[type="file"]::-webkit-file-upload-button:active {
+    transform: translateY(2px);
+    box-shadow: var(--button-shadow-active);
+}
+
+/* Bulk upload label */
+.bulk-upload-controls label {
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+    color: var(--text-color);
+}
+
+/* Button styling - common properties */
+button {
+    padding: var(--padding-sm) var(--padding-md);
+    border-radius: var(--border-radius-sm);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    /* Removed margin-right as gap on parent takes care of spacing */
+    flex-shrink: 0;
+
+    box-shadow: var(--button-shadow-initial);
+    transition: all 0.2s ease-in-out;
+}
+
+button:hover {
+    box-shadow: var(--button-shadow-hover);
+}
+
+button:active {
+    transform: translateY(2px);
+    box-shadow: var(--button-shadow-active);
+}
+
+/* Specific button colors and gradients */
+button[onclick="addItem()"] {
+    background-image: linear-gradient(to bottom, var(--add-btn-gradient-start), var(--add-btn-gradient-end));
+    background-color: var(--add-btn-gradient-end); /* Fallback */
+}
+button[onclick="addItem()"]:hover {
+    background-image: none;
+    background-color: var(--add-btn-hover-bg);
+}
+
+button[onclick="updateItem()"] {
+    background-image: linear-gradient(to bottom, var(--update-btn-gradient-start), var(--update-btn-gradient-end));
+    background-color: var(--update-btn-gradient-end); /* Fallback */
+    color: var(--update-btn-text);
+}
+button[onclick="updateItem()"]:hover {
+    background-image: none;
+    background-color: var(--update-btn-hover-bg);
+}
+
+button[onclick="deleteItem()"] {
+    background-image: linear-gradient(to bottom, var(--delete-btn-gradient-start), var(--delete-btn-gradient-end));
+    background-color: var(--delete-btn-gradient-end); /* Fallback */
+}
+button[onclick="deleteItem()"]:hover {
+    background-image: none;
+    background-color: var(--delete-btn-hover-bg);
+}
+
+button[onclick="uploadExcel()"] {
+    background-image: linear-gradient(to bottom, var(--add-btn-gradient-start), var(--add-btn-gradient-end));
+    background-color: var(--add-btn-gradient-end); /* Fallback */
+}
+button[onclick="uploadExcel()"]:hover {
+    background-image: none;
+    background-color: var(--add-btn-hover-bg);
+}
+
+/* Table styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0;
+    background-color: var(--container-bg);
+}
+
+th, td {
+    padding: var(--padding-md) var(--padding-lg);
+    border: 1px solid var(--table-border-color);
+    text-align: left;
+    color: var(--text-color);
+    font-size: 0.95rem;
+}
+
+th {
+    background-color: var(--table-header-bg);
+    color: var(--heading-color);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* Alternating row colors */
+tbody tr:nth-child(even) {
+    background-color: var(--table-row-even-bg);
+}
+
+tbody tr:hover {
+    background-color: #e0f2f7;
+}
+
+/* Optional: Focus styles for accessibility */
+input:focus,
+button:focus {
+    outline: 2px solid var(--update-btn-hover);
+    outline-offset: 2px;
+}
+
+/* Media query for responsiveness */
+@media (max-width: 768px) {
+    .pos-container {
+        border-radius: 0;
+    }
+
+    body {
+        padding: 0;
+    }
+
+    .input-controls,
+    .bulk-upload-controls {
+        flex-direction: column;
+        align-items: stretch;
+        padding: var(--padding-md);
+    }
+
+    input[type="text"],
+    input[type="number"],
+    button {
+        width: 100%;
+    }
+
+    /* Ensure the action-buttons group also stacks */
+    .action-buttons {
+        flex-direction: column;
+        width: 100%; /* Make the group take full width */
+    }
+
+    input[type="file"]::-webkit-file-upload-button {
+        width: 100%;
+        margin-left: 0;
+    }
+
+    .bulk-upload-controls label {
+        margin-bottom: var(--gap-sm);
+        justify-content: center;
+    }
+}
+
+/* Sticky header */
+.pos-header.sticky { position: sticky; top: 0; z-index: 5; }
+
+/* Table wrapper for horizontal scroll on small screens */
+.table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.table-wrapper table { min-width: 600px; }
+
+/* 9:16 portrait mobile refinements */
+@media (orientation: portrait), (max-aspect-ratio: 9/16), (max-width: 480px) {
+  body { padding: var(--padding-md); }
+  .pos-header { font-size: 1.2em; }
+  .input-controls, .bulk-upload-controls { flex-direction: column; align-items: stretch; gap: 10px; }
+  .action-buttons { flex-direction: row; gap: 8px; }
+  .action-buttons button { flex: 1; padding: 10px 12px; }
+  .table-wrapper { margin-top: 8px; }
+  #menuTable th, #menuTable td { padding: 10px 12px; font-size: 0.95rem; }
+}
+
+/* JS-scoped mobile class support */
+body.is-mobile .table-wrapper { overflow-x: auto; }
+body.is-mobile .table-wrapper table { min-width: 600px; }

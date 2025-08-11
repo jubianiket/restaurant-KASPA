@@ -5,8 +5,30 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Order Table</title>
 	<link rel="stylesheet" href="../css/order.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
+    <script>
+        // Initialize Supabase client
+        const supabaseUrl = 'YOUR_SUPABASE_URL'
+        const supabaseKey = 'YOUR_SUPABASE_ANON_KEY'
+        const supabase = supabase.createClient(supabaseUrl, supabaseKey)
+    </script>
 </head>
 <body>
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="loading-spinner hidden">
+        <div class="spinner"></div>
+        <p>Loading orders...</p>
+    </div>
+    <!-- Error Toast -->
+    <div id="errorToast" class="error-toast hidden">
+        <p class="error-message"></p>
+        <button class="retry-btn">Retry</button>
+    </div>
+    <!-- Offline Banner -->
+    <div id="offlineBanner" class="offline-banner hidden">
+        You are currently offline. Some features may be limited.
+    </div>
 	<div class="order-layout">
 		<div class="sidebar">
 			<div class="sidebar-header">
