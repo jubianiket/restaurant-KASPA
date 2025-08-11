@@ -48,6 +48,9 @@ app = Flask(__name__, template_folder="templates", static_folder="static")
 secret_key = os.getenv("SECRET_KEY") or load_settings().get("secret_key") or "change-me"
 app.secret_key = secret_key
 CORS(app)
+# Disable static caching and add asset version for cache-busting
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+app.config['ASSET_VERSION'] = os.environ.get('ASSET_VERSION', '20250811')
 
 # -------------- Auth Decorator ----------------
 
