@@ -145,7 +145,18 @@ def get_orders_route():
         orders = get_all_orders(from_date, to_date)
     else:
         orders = get_all_orders()
+
+    # Ensure `items` is a JSON array, not a string
+    for order in orders:
+        if isinstance(order.get("items"), str):
+            try:
+                order["items"] = json.loads(order["items"])
+            except json.JSONDecodeError:
+                pass
+
     return jsonify({"status": "success", "data": orders})
+
+
 
 @app.route("/orders/<int:order_id>/complete", methods=["POST"])
 @login_required()

@@ -10,22 +10,10 @@ window.onload = () => {
 let allOrders = [];
 
 function formatItemsForDisplay(items) {
-    if (!items) return "N/A";
-
-    // First parse if it's a string
-    if (typeof items === 'string') {
-        try { items = JSON.parse(items); } catch(e) { return items; }
-    }
-
-    // If it's still a string after first parse, try parsing again (double-encoded case)
-    if (typeof items === 'string') {
-        try { items = JSON.parse(items); } catch(e) { return items; }
-    }
-
     if (!Array.isArray(items) || items.length === 0) return "N/A";
-
     return items.map(item => `${item.name} x${item.qty}`).join(", ");
 }
+
 
 function updateEditTotal() {
     const subtotal = parseFloat(document.getElementById("editSubtotal").value) || 0;
