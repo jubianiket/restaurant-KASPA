@@ -24,18 +24,43 @@ function updateEditTotal() {
 async function loadOrders() {
     const from = document.getElementById("fromDate").value;
     const to = document.getElementById("toDate").value;
-    let url = window.location.origin + "/orders";
-    const params = [];
-    if (from) params.push(`from_date=${from}`);
-    if (to) params.push(`to_date=${to}`);
-    if (params.length > 0) url += `?${params.join('&')}`;
+    const url = window.location.origin + "/orders"; // fetch all; filter client-side for robustness
+
+    function parseOrderDate(ds){
+        if (!ds) return null;
+        // Try native
+        let d = new Date(ds);
+        if (!isNaN(d)) return d;
+        // Try YYYY-MM-DD HH:MM:SS
+        const m = ds.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2}):(\d{2})/);
+        if (m) {
+            const [_, y, mo, da, hh, mi, ss] = m;
+            return new Date(Number(y), Number(mo)-1, Number(da), Number(hh), Number(mi), Number(ss));
+        }
+        // Try DD/MM/YYYY, HH:MM:SS AM/PM
+        const m2 = ds.match(/^(\d{2})\/(\d{2})\/(\d{4}),\s*(\d{1,2}):(\d{2}):(\d{2})\s*(AM|PM)$/i);
+        if (m2) {
+            let [_, da, mo, y, hh, mi, ss, ap] = m2;
+            hh = Number(hh)%12 + (ap.toUpperCase()==='PM'?12:0);
+            return new Date(Number(y), Number(mo)-1, Number(da), Number(hh), Number(mi), Number(ss));
+        }
+        return null;
+    }
 
     try {
         const res = await fetch(url);
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         const json = await res.json();
         if (json.status !== 'success') throw new Error(json.message || 'API error');
-        allOrders = json.data || [];
+        const fromD = from ? new Date(from+"T00:00:00") : null;
+        const toD = to ? new Date(to+"T23:59:59") : null;
+        allOrders = (json.data || []).filter(row => {
+            const d = parseOrderDate(row.date);
+            if (!d) return true; // keep if unknown format
+            if (fromD && d < fromD) return false;
+            if (toD && d > toD) return false;
+            return true;
+        });
 
         const tbody = document.querySelector("#ordersTable tbody");
         tbody.innerHTML = "";
