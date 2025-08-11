@@ -215,7 +215,7 @@ function renderMenuItems() {
     filteredItems.sort((a, b) => a.name.localeCompare(b.name));
 
     if (filteredItems.length === 0) {
-        itemGrid.innerHTML = '<p style="text-align: center;">No items found.</p>';
+        itemGrid.innerHTML = '<p<style="text-align: center;">No items found.</p>';
         return;
     }
 
@@ -424,10 +424,16 @@ function confirmOrder() {
 
     if (orderObj.order_id) {
         // Append items to an existing order (both Table and Delivery)
+        // sanitize itemsToSend to ensure we send a real array/object (not an escaped JSON string)
+        let sanitizedItems = itemsToSend;
+        if (typeof sanitizedItems === 'string') {
+            try { sanitizedItems = JSON.parse(sanitizedItems); console.log('Parsed itemsToSend string into array/object', sanitizedItems); } catch(e) { console.warn('itemsToSend is a string but not valid JSON, sending as-is', sanitizedItems); }
+        }
+        console.log('Sending items to append_items:', sanitizedItems);
         fetch(`/orders/${orderObj.order_id}/append_items`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ items: itemsToSend })
+            body: JSON.stringify({ items: sanitizedItems })
         })
         .then(res => res.json())
         .then(data => {
@@ -459,6 +465,11 @@ function confirmOrder() {
             date: new Date().toLocaleString(),
             status: 'received'
         };
+        // sanitize order.items to ensure we send array/object (not an escaped JSON string)
+        if (order && typeof order.items === 'string') {
+            try { order.items = JSON.parse(order.items); console.log('Parsed order.items string into array/object', order.items); } catch(e) { console.warn('order.items is a string but not valid JSON, sending as-is', order.items); }
+        }
+        console.log('Sending new order to /save_order:', order);
         fetch('/save_order', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
