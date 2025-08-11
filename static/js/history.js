@@ -25,9 +25,13 @@ function updateEditTotal() {
     document.getElementById("editTotal").value = (subtotal + gst).toFixed(2);
 }
 
+// Safe DOM getters
+function $(sel){ return document.querySelector(sel); }
+function $val(id){ const el = document.getElementById(id); return el ? el.value : ''; }
+
 async function loadOrders() {
-    const from = document.getElementById("fromDate").value;
-    const to = document.getElementById("toDate").value;
+    const from = $val('fromDate');
+    const to = $val('toDate');
     const url = window.location.origin + "/orders"; // fetch all; filter client-side for robustness
 
     function parseOrderDate(ds){

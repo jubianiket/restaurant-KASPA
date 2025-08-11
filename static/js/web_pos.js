@@ -1,6 +1,7 @@
 function loadPage(path) {
     const frame = document.getElementById("contentFrame");
-    frame.src = path;
+    const sep = path.includes('?') ? '&' : '?';
+    frame.src = `${path}${sep}v=${Date.now()}`;
 }
 
 function updateClock() {
