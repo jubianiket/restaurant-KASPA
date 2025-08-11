@@ -132,6 +132,8 @@ def pay_order(table_number):
 @login_required()
 def save_order_route():
     data = request.get_json()
+    if "date" in data:
+        del data["date"]    
     new_order_id = save_order(data)
     return jsonify({
         "status": "success",
