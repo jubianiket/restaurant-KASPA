@@ -10,10 +10,13 @@ window.onload = () => {
 let allOrders = [];
 
 function formatItemsForDisplay(items) {
+    if (!items) return "N/A";
+    if (!Array.isArray(items)) {
+        try { items = JSON.parse(items); } catch (e) { return "N/A"; }
+    }
     if (!Array.isArray(items) || items.length === 0) return "N/A";
     return items.map(item => `${item.name} x${item.qty}`).join(", ");
 }
-
 
 function updateEditTotal() {
     const subtotal = parseFloat(document.getElementById("editSubtotal").value) || 0;
@@ -102,13 +105,10 @@ function openEditModal(orderId) {
     // Render items as editable rows
     const itemsContainer = document.getElementById("editItemsContainer");
     itemsContainer.innerHTML = "";
-    let items = order.items;
-    if (typeof items === 'string') {
-        try { items = JSON.parse(items); } catch(e) {}
-    }
-    if (typeof items === 'string') {
-    try { items = JSON.parse(items); } catch(e) {}
-}
+    let items = Array.isArray(order.items) ? order.items : (() => {
+    try { return JSON.parse(order.items); } catch(e) { return []; }
+    })();
+
     (items || []).forEach((item, idx) => {
         const row = document.createElement("div");
         row.className = "edit-item-row";
